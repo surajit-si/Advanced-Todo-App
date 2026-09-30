@@ -9,7 +9,7 @@ export type Todo = {
   completedAt?: number;
   reminderAt?: number[];
 };
-export default function TodoContainer() {
+export default function TodoContainer({className}: {className?: string}) {
   const todoList: Todo[] = [
     {
       task: "Buy groceries",
@@ -28,7 +28,7 @@ export default function TodoContainer() {
     },
   ];
   return (
-    <div className="todo-container flex flex-col w-full h-full overflow-y-scroll">
+    <div className={`${className} todo-container flex flex-col w-full h-max overflow-y-scroll`}>
       <Todo todo={todoList[0]} />
     </div>
   );

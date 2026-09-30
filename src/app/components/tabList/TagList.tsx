@@ -22,7 +22,7 @@ export default function TagList({ className }: { className?: string }) {
 
   return (
     <div
-      className={`${className} flex flex-row gap-2 px-2 overflow-x-scroll hide-scrollbar`}
+      className={`${className} py-2 flex flex-row gap-2 px-2 overflow-x-scroll hide-scrollbar`}
     >
       {list.map((tag) => {
         return (

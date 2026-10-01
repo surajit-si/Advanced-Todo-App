@@ -9,7 +9,7 @@ export type Todo = {
   completedAt?: number;
   reminderAt?: number[];
 };
-export default function TodoContainer({className}: {className?: string}) {
+export default function TodoContainer({ className }: { className?: string }) {
   const todoList: Todo[] = [
     {
       task: "Buy groceries",
@@ -28,8 +28,12 @@ export default function TodoContainer({className}: {className?: string}) {
     },
   ];
   return (
-    <div className={`${className} todo-container flex flex-col w-full h-max overflow-y-scroll`}>
-      <Todo todo={todoList[0]} />
+    <div
+      className={`${className} todo-container flex flex-col w-full h-max overflow-y-scroll`}
+    >
+      {todoList.map((todo, idx) => {
+        return <Todo todo={todo} idx={idx} key={idx} />;
+      })}
     </div>
   );
 }

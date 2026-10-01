@@ -2,14 +2,29 @@
 
 import { useState } from "react";
 import { type Todo } from "./TodoContainer";
-import { ChevronDown, ChevronUp, Pencil, Trash } from "lucide-react";
+import { ChevronUp, Pencil, Trash } from "lucide-react";
 
-export default function Todo({ todo }: { todo: Todo }) {
+export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isHovering, setIsHovering] = useState<boolean>(false);
+
+  const handleEnter = () => {
+    setIsHovering(true);
+  };
+  const handleLeave = () => {
+    setIsHovering(false);
+  };
+
+  //ragex
+  // Works everywhere without TS target warnings:
+  const finalTitle = (str: string) =>
+    str.replace(/^([\s\S]{13})[\s\S]{3,}$/, "$1...");
 
   return (
     <div
-      className="mx-2 flex justify-center flex-col border-t border-b border-[hsla(0,0%,0%,0.5)] cursor-pointer transition-all duration-200 "
+      className={`${idx === 0 ? "border-t" : ""} mx-2 flex justify-center flex-col  border-b border-[hsla(0,0%,0%,0.5)] cursor-pointer transition-all duration-200 `}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
       onClick={() => setIsOpen(!isOpen)}
     >
       <div className="flex items-center gap-2 px-2 relative py-2 ">
@@ -20,11 +35,21 @@ export default function Todo({ todo }: { todo: Todo }) {
         />
 
         {/* Task */}
-        <p className="opacity-70! ">Task</p>
+        {isHovering ? (
+          <p className={`opacity-70! text-sm `}>{finalTitle(todo.task)}</p>
+        ) : (
+          <p className={`opacity-70! text-sm `}>{todo.task}</p>
+        )}
 
-        {/* Timer */}
-        <span className="border-[hsla(0,0%,0%)] opacity-70 border py-1 px-2 rounded-full absolute left-1/2 -translate-x-1/2">
-          12:00
+        {/* Date */}
+        <span
+          className={`${isHovering ? "" : "hidden"} border-[hsla(0,0%,0%)] opacity-70 border py-1 px-2 rounded-full absolute left-1/2 -translate-x-1/2 text-[0.6em]  `}
+        >
+          {new Date(todo.deadline).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
         </span>
         {/* Buttons */}
         <span className="absolute right-2 inline-flex items-center gap-3 p-2 min-w-max whitespace-nowrap">
@@ -39,10 +64,7 @@ export default function Todo({ todo }: { todo: Todo }) {
         <div className="">
           <p className="pl-6 opacity-70">Description:-</p>
           <p className="opacity-50 pl-8 pb-2 ">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa
-            architecto veniam, dignissimos ex cumque quidem ut aut ducimus
-            veritatis rerum earum libero enim dolorem consectetur nesciunt,
-            dolore asperiores minima porro.
+            {todo.description || "No description provided."}
           </p>
         </div>
       )}

@@ -17,8 +17,14 @@ export default function Home() {
       {/* Bottom Navbar */}
       <BottomNavbar className="" />
       {/* Delete Button */}
-      <DeletePopup className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2">
-        Are you sure you want to delete this item?
+      <DeletePopup
+        leftSideButtonName="Cancel"
+        leftSideButtonClassName="text-primary"
+        rightSideButtonName="Delete"
+        rightSideButtonClassName="text-white bg-danger"
+        className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2"
+      >
+        <h1 className="text-2xl">Are you sure?</h1>
       </DeletePopup>
     </div>
   );

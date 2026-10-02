@@ -9,6 +9,7 @@ export interface IUser {
   updatedAt: Date;
   todos: mongoose.Types.ObjectId[];
   profiles: mongoose.Types.ObjectId[];
+  selectedProfile: mongoose.Types.ObjectId;
 }
 
 const UserSchema: Schema<IUser> = new Schema<IUser>(
@@ -18,6 +19,10 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
     password: { type: String, required: true },
     todos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Todo" }],
     profiles: [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }],
+    selectedProfile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile",
+    },
   },
   { timestamps: true },
 );

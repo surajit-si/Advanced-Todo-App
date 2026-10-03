@@ -1,8 +1,8 @@
-import BottomNavbar from "./components/bottomNavbar/BottomNavbar";
-import DeletePopup from "./components/deleteButton/DeletePopup";
-import Navbar from "./components/navbar/Navbar";
-import TagList from "./components/tabList/TagList";
-import TodoContainer from "./components/todoContainer/TodoContainer";
+import BottomNavbar from "./_components/bottomNavbar/BottomNavbar";
+import DeletePopup from "./_components/deleteButton/DeletePopup";
+import Navbar from "./_components/navbar/Navbar";
+import TagList from "./_components/tabList/TagList";
+import TodoContainer from "./_components/todoContainer/TodoContainer";
 
 export default function Home() {
   return (
@@ -17,7 +17,7 @@ export default function Home() {
       {/* Bottom Navbar */}
       <BottomNavbar className="" />
       {/* Delete Button */}
-      <DeletePopup
+      {/* <DeletePopup
         leftSideButtonName="Cancel"
         leftSideButtonClassName="text-primary"
         rightSideButtonName="Delete"
@@ -25,7 +25,7 @@ export default function Home() {
         className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2"
       >
         <h1 className="text-2xl">Are you sure?</h1>
-      </DeletePopup>
+      </DeletePopup> */}
     </div>
   );
 }

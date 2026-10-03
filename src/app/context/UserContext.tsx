@@ -8,7 +8,8 @@ import {
   useContext,
   useState,
 } from "react";
-import { IUser } from "../../app/";
+
+import { IUser } from "../(Backend)/db/model/User.schema";
 
 interface UserContextType {
   user: IUser | null;
@@ -22,7 +23,7 @@ export default function UserProvider({ children }: { children: ReactNode }) {
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
-        {children}
+      {children}
     </UserContext.Provider>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import UserProvider from "./context/UserContext";
 
 export const metadata: Metadata = {
   title: "Advanced Todo App",
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="openSansFont ">
-      <body className="min-h-dvh flex flex-col items-center ">{children}</body>
+      <body className="min-h-dvh flex flex-col items-center ">
+        <UserProvider>{children}</UserProvider>
+      </body>
     </html>
   );
 }

@@ -49,6 +49,7 @@ export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
             month: "short",
             day: "numeric",
             year: "numeric",
+            timeZone: "UTC",
           })}
         </span>
         {/* Buttons */}

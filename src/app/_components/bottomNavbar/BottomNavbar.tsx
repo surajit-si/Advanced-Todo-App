@@ -1,5 +1,6 @@
 "use client";
 
+import { updateUser } from "@/app/utils/user.utild";
 import { useUser } from "../../context/UserContext";
 import {
   CirclePlus,
@@ -11,13 +12,26 @@ import {
   UserPen,
   UserPlus,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { redirect } from "next/navigation";
 
 export default function BottomNavbar({ className }: { className?: string }) {
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
 
   //User
   const { user, setUser } = useUser();
+
+  //Update User
+  useEffect(() => {
+    updateUser().then((curr) => {
+      setUser(curr);
+
+      //redirect user if unvarified...
+      if (!curr?.isVerified) {
+        redirect("/verify-email");
+      }
+    });
+  }, []);
 
   return (
     <div className={`${className} absolute bottom-0 w-full`}>

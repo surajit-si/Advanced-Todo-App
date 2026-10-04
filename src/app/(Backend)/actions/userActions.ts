@@ -1,11 +1,15 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { User } from "../db/model/User.schema";
+import { IUser, User } from "../db/model/User.schema";
 import { sendEmail } from "../lib/brevo";
 import connectDB from "../lib/connectDB";
 import { cookies } from "next/headers";
-import { generateAccessToken, generateRefreshToken } from "../lib/jose";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyToken,
+} from "../lib/jose";
 
 export async function registerUser(formData: FormData) {
   let isSuccess = false;
@@ -107,4 +111,39 @@ export async function loginUser(formData: FormData) {
   if (isSuccess) {
     redirect("/");
   }
+}
+
+export async function getUser(): Promise<{
+  success: boolean;
+  data?: IUser;
+  error?: string;
+}> {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken");
+
+  if (!accessToken) return { success: false, error: "Unauthorized!" };
+
+  const payload = await verifyToken(accessToken.value);
+
+  if (!payload) return { success: false, error: "Invalid token!" };
+
+  await connectDB();
+
+  const user = await User.findOne({ _id: payload.userId }).select("-password");
+  if (!user) return { success: false, error: "Invalid token!" };
+
+  return {
+    success: true,
+    data: {
+      _id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      isVerified: user.isVerified,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      profiles: user.profiles,
+      selectedProfile: user.selectedProfile,
+      todos: user.todos,
+    },
+  };
 }

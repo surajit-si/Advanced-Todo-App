@@ -4,7 +4,12 @@ import Navbar from "./_components/navbar/Navbar";
 import TagList from "./_components/tabList/TagList";
 import TodoContainer from "./_components/todoContainer/TodoContainer";
 
+import { getUser } from "./(Backend)/actions/userActions";
+import { updateUser } from "./utils/user.utild";
+
 export default function Home() {
+  //getUser
+
   return (
     <div className="w-full h-screen border relative">
       {/* Navbar */}

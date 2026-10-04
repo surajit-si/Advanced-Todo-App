@@ -5,7 +5,7 @@ import BetterInput from "./BetterInput";
 import { useState } from "react";
 
 export default function SignUp() {
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState("aaa");
 
   //Submit form
   async function handleSubmit(formData: FormData) {
@@ -18,18 +18,14 @@ export default function SignUp() {
     }
 
     setStatus("Creating account...");
-    const result = await registerUser(formData);
-    setStatus(
-      result.success
-        ? (result.message ?? "Account created successfully.")
-        : (result.error ?? "Failed to create account."),
-    );
+    await registerUser(formData);
   }
 
   return (
     <div className="p-4 rounded-3xl border flex flex-col items-center justify-center gap-1">
       <h1 className="text-3xl font-normal">Sign Up</h1>
       <p className="text-sm">Sign up to get started</p>
+      {status && <p>{status}</p>}
       {/* Form */}
       <form
         action={handleSubmit}
@@ -52,7 +48,6 @@ export default function SignUp() {
           {" "}
           Sign Up{" "}
         </button>
-        {status && <p role="status">{status}</p>}
       </form>
     </div>
   );

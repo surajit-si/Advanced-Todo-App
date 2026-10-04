@@ -1,9 +1,12 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { User } from "../db/model/User.schema";
+import { sendEmail } from "../lib/brevo";
 import connectDB from "../lib/connectDB";
 
 export async function registerUser(formData: FormData) {
+  let isSuccess = false;
   try {
     const nameValue = formData.get("name");
     const emailValue = formData.get("email");
@@ -32,11 +35,13 @@ export async function registerUser(formData: FormData) {
       password: password,
     });
 
-    return {
+    isSuccess = true;
+
+    /* return {
       success: true,
       message: "User created successfully!",
       data: { name: userName, email },
-    };
+    }; */
   } catch (error: unknown) {
     console.error(error);
     return {
@@ -46,5 +51,8 @@ export async function registerUser(formData: FormData) {
           ? error.message
           : "Failed to create user. Please try again.",
     };
+  }
+  if (isSuccess) {
+    redirect("/verify-email");
   }
 }

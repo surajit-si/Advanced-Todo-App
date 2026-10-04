@@ -10,6 +10,7 @@ export interface IUser {
   todos: mongoose.Types.ObjectId[];
   profiles: mongoose.Types.ObjectId[];
   selectedProfile: mongoose.Types.ObjectId;
+  isVerified: boolean;
 }
 
 const UserSchema: Schema<IUser> = new Schema<IUser>(
@@ -23,6 +24,7 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Profile",
     },
+    isVerified: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

@@ -1,11 +1,13 @@
 "use client";
 
+
+import Link from "next/link";
 import { registerUser } from "../../(Backend)/actions/userActions";
 import BetterInput from "./BetterInput";
 import { useState } from "react";
 
 export default function SignUp() {
-  const [status, setStatus] = useState("aaa");
+  const [status, setStatus] = useState("");
 
   //Submit form
   async function handleSubmit(formData: FormData) {
@@ -24,7 +26,9 @@ export default function SignUp() {
   return (
     <div className="p-4 rounded-3xl border flex flex-col items-center justify-center gap-1">
       <h1 className="text-3xl font-normal">Sign Up</h1>
-      <p className="text-sm">Sign up to get started</p>
+      <p className="text-sm">
+        Already have an account? <Link href={"/sign-in"} className="text-primary font-bold">Sign in</Link>
+      </p>
       {status && <p>{status}</p>}
       {/* Form */}
       <form

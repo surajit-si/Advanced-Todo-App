@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { User } from "../db/model/User.schema";
 import { sendEmail } from "../lib/brevo";
 import connectDB from "../lib/connectDB";
+import { cookies } from "next/headers";
+import { generateAccessToken, generateRefreshToken } from "../lib/jose";
 
 export async function registerUser(formData: FormData) {
   let isSuccess = false;
@@ -54,5 +56,55 @@ export async function registerUser(formData: FormData) {
   }
   if (isSuccess) {
     redirect("/verify-email");
+  }
+}
+
+export async function loginUser(formData: FormData) {
+  //get cookies
+  const cookieStore = await cookies();
+
+  let isSuccess = false;
+  try {
+    const emailValue = formData.get("email");
+    const passwordValue = formData.get("password");
+
+    const email = typeof emailValue === "string" ? emailValue.trim() : "";
+    const password = typeof passwordValue === "string" ? passwordValue : "";
+
+    if (!email) return { success: false, error: "Email field is required!" };
+    if (!password)
+      return { success: false, error: "Password field is required!" };
+
+    //connect database
+    await connectDB();
+
+    const user = await User.findOne({ email });
+    if (!user) return { success: false, error: "Invalid email!" };
+
+    //check password
+    if (user.password !== password) {
+      return { success: false, error: "Invalid password!" };
+    }
+
+    //create cookie
+    const accessToken = await generateAccessToken(user._id.toString());
+    const refreshToken = await generateRefreshToken(user._id.toString());
+
+    cookieStore.set("accessToken", accessToken);
+    cookieStore.set("refreshToken", refreshToken);
+
+    isSuccess = true;
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to login. Please try again.",
+    };
+  }
+
+  if (isSuccess) {
+    redirect("/");
   }
 }

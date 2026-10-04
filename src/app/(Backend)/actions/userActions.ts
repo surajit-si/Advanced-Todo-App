@@ -3,11 +3,15 @@
 import { User } from "../db/model/User.schema";
 import connectDB from "../lib/connectDB";
 
-export async function createNewUser(formData: FormData) {
+export async function registerUser(formData: FormData) {
   try {
-    const userName = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const nameValue = formData.get("name");
+    const emailValue = formData.get("email");
+    const passwordValue = formData.get("password");
+
+    const userName = typeof nameValue === "string" ? nameValue.trim() : "";
+    const email = typeof emailValue === "string" ? emailValue.trim() : "";
+    const password = typeof passwordValue === "string" ? passwordValue : "";
 
     if (!userName) return { success: false, error: "Name field is required!" };
     if (!email) return { success: false, error: "Email field is required!" };
@@ -20,9 +24,9 @@ export async function createNewUser(formData: FormData) {
     //Check if user already exists
     const userExists = await User.findOne({ email });
 
-    if (!userExists) return { success: false, error: "User already exists!" };
+    if (userExists) return { success: false, error: "Email already in use!" };
 
-    const createdUser = await User.create({
+    await User.create({
       name: userName,
       email: email,
       password: password,
@@ -33,10 +37,14 @@ export async function createNewUser(formData: FormData) {
       message: "User created successfully!",
       data: { name: userName, email },
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error(error);
     return {
       success: false,
-      error: error?.message || "Failed to create user. Please try again.",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to create user. Please try again.",
     };
   }
 }

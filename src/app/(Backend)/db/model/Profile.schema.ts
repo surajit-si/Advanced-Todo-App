@@ -20,4 +20,4 @@ const ProfileSchema: Schema<IProfile> = new Schema<IProfile>(
   {},
 );
 
-export const Profile = mongoose.model<IProfile>("Profile", ProfileSchema);
+export const Profile = mongoose.model("Profile", ProfileSchema);

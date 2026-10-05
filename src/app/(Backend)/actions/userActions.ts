@@ -10,6 +10,30 @@ import {
   generateRefreshToken,
   verifyToken,
 } from "../lib/jose";
+import { Otp } from "../db/model/Otp.schema";
+import ActionResponse, { IActionResponse } from "../lib/ActionResponse";
+
+async function verifyUser() {
+  const cookieStore = await cookies();
+
+  const accessToken = cookieStore.get("accessToken");
+  if (!accessToken)
+    return ActionResponse({ success: false, errorMsg: "Unauthorized!" });
+
+  const payload = await verifyToken(accessToken.value);
+
+  if (!payload)
+    return ActionResponse({ success: false, errorMsg: "Invalid token!" });
+
+  await connectDB();
+
+  const user = await User.findById(payload.userId).select("-password");
+
+  if (!user)
+    return ActionResponse({ success: false, errorMsg: "Invalid token!" });
+
+  return ActionResponse({ success: true, data: user });
+}
 
 export async function registerUser(formData: FormData) {
   let isSuccess = false;
@@ -22,10 +46,21 @@ export async function registerUser(formData: FormData) {
     const email = typeof emailValue === "string" ? emailValue.trim() : "";
     const password = typeof passwordValue === "string" ? passwordValue : "";
 
-    if (!userName) return { success: false, error: "Name field is required!" };
-    if (!email) return { success: false, error: "Email field is required!" };
+    if (!userName)
+      return ActionResponse({
+        success: false,
+        errorMsg: "Name field is required!",
+      });
+    if (!email)
+      return ActionResponse({
+        success: false,
+        errorMsg: "Email field is required!",
+      });
     if (!password)
-      return { success: false, error: "Password field is required!" };
+      return ActionResponse({
+        success: false,
+        errorMsg: "Password field is required!",
+      });
 
     //connect database
     await connectDB();
@@ -33,7 +68,11 @@ export async function registerUser(formData: FormData) {
     //Check if user already exists
     const userExists = await User.findOne({ email });
 
-    if (userExists) return { success: false, error: "Email already in use!" };
+    if (userExists)
+      return ActionResponse({
+        success: false,
+        errorMsg: "Email already in use!",
+      });
 
     await User.create({
       name: userName,
@@ -42,21 +81,14 @@ export async function registerUser(formData: FormData) {
     });
 
     isSuccess = true;
-
-    /* return {
-      success: true,
-      message: "User created successfully!",
-      data: { name: userName, email },
-    }; */
   } catch (error: unknown) {
-    console.error(error);
-    return {
+    return ActionResponse({
       success: false,
-      error:
+      errorMsg:
         error instanceof Error
           ? error.message
           : "Failed to create user. Please try again.",
-    };
+    });
   }
   if (isSuccess) {
     redirect("/verify-email");
@@ -75,19 +107,33 @@ export async function loginUser(formData: FormData) {
     const email = typeof emailValue === "string" ? emailValue.trim() : "";
     const password = typeof passwordValue === "string" ? passwordValue : "";
 
-    if (!email) return { success: false, error: "Email field is required!" };
+    if (!email)
+      return ActionResponse({
+        success: false,
+        errorMsg: "Email field is required!",
+      });
     if (!password)
-      return { success: false, error: "Password field is required!" };
+      return ActionResponse({
+        success: false,
+        errorMsg: "Password field is required!",
+      });
 
     //connect database
     await connectDB();
 
     const user = await User.findOne({ email });
-    if (!user) return { success: false, error: "Invalid email!" };
+    if (!user)
+      return ActionResponse({
+        success: false,
+        errorMsg: "Email is not registered!",
+      });
 
     //check password
     if (user.password !== password) {
-      return { success: false, error: "Invalid password!" };
+      return ActionResponse({
+        success: false,
+        errorMsg: "Password not matched",
+      });
     }
 
     //create cookie
@@ -99,13 +145,18 @@ export async function loginUser(formData: FormData) {
 
     isSuccess = true;
   } catch (error) {
-    return {
+    let errorObj = {};
+    if (error instanceof Error && process.env.NODE_ENV === "development") {
+      errorObj = { message: error.message, stack: error.stack };
+    }
+    return ActionResponse({
       success: false,
-      error:
+      errorMsg:
         error instanceof Error
           ? error.message
           : "Failed to login. Please try again.",
-    };
+      ...errorObj,
+    });
   }
 
   if (isSuccess) {
@@ -113,37 +164,184 @@ export async function loginUser(formData: FormData) {
   }
 }
 
-export async function getUser(): Promise<{
+export async function getUser(): Promise<IActionResponse<IUser>> {
+  try {
+    const response = await verifyUser();
+    if (!response.success)
+      return ActionResponse({ success: false, errorMsg: response.errorMsg });
+    const user = response.data as IUser;
+
+    return ActionResponse({
+      success: true,
+      data: {
+        _id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        profiles: user.profiles,
+        selectedProfile: user.selectedProfile,
+        todos: user.todos,
+      },
+    });
+  } catch (error) {
+    let errorObj = {};
+    if (error instanceof Error && process.env.NODE_ENV === "development") {
+      errorObj = { message: error.message, stack: error.stack };
+    }
+    return ActionResponse({
+      success: false,
+      dev:
+        process.env.NODE_ENV === "development"
+          ? {
+              name: errorObj.name,
+              stack: errorObj.stack,
+            }
+          : undefined,
+    });
+  }
+}
+
+export async function sendOTP(): Promise<{
   success: boolean;
-  data?: IUser;
+  data?: { reminingTime: number };
   error?: string;
+  message?: string;
 }> {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken");
+  try {
+    const response = await verifyUser();
+    if (!response.success) return response;
+    const user = response.data as IUser;
 
-  if (!accessToken) return { success: false, error: "Unauthorized!" };
+    //check if otp already exgists
+    const otpExists = await Otp.findOne({ userId: user._id });
 
-  const payload = await verifyToken(accessToken.value);
+    let currTime = 0;
+    let lastUpdatedTime = 0;
 
-  if (!payload) return { success: false, error: "Invalid token!" };
+    let resendCondition: number = 0;
+    if (otpExists) {
+      currTime = Date.now();
+      lastUpdatedTime = new Date(otpExists.updatedAt).getTime();
 
-  await connectDB();
+      resendCondition = (currTime - lastUpdatedTime) / 1000;
+    }
 
-  const user = await User.findOne({ _id: payload.userId }).select("-password");
-  if (!user) return { success: false, error: "Invalid token!" };
+    //check if in cooldown
+    //send remining time
+    if (otpExists && resendCondition < 60)
+      return ActionResponse({
+        success: false,
+        errorMsg: "Please wait sometimes before resending OTP.",
+        data: { reminingTime: Math.ceil(60 - resendCondition) },
+      });
 
-  return {
-    success: true,
-    data: {
-      _id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-      isVerified: user.isVerified,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      profiles: user.profiles,
-      selectedProfile: user.selectedProfile,
-      todos: user.todos,
-    },
-  };
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    await sendEmail({
+      to: user.email,
+      subject: "OTP",
+      htmlContent: `<p>Your OTP is ${otp}</p>`,
+    });
+
+    //if otp not exists create new otp else update otp
+    if (!otpExists) {
+      await Otp.create({
+        userId: user._id,
+        code: otp.toString(),
+      });
+    } else {
+      otpExists.code = otp.toString();
+      otpExists.expiresAt = new Date(Date.now() + 5 * 1000);
+      await otpExists.save();
+    }
+
+    return ActionResponse({ success: true, message: "OTP sent successfully!" });
+  } catch (error) {
+    console.log(error);
+
+    let errorObj = {};
+    if (error instanceof Error && process.env.NODE_ENV === "development") {
+      errorObj = { message: error.message, stack: error.stack };
+    }
+
+    return ActionResponse({
+      success: false,
+      errorMsg: "Failed to send OTP. Please try again.",
+      dev:
+        process.env.NODE_ENV === "development"
+          ? {
+              name: errorObj.name,
+              stack: errorObj.stack,
+            }
+          : undefined,
+    });
+  }
+}
+
+export async function verifyOTP(formDate: FormData) {
+  let isSuccess = false;
+  try {
+    const otpValue = formDate.get("otp");
+    //if no otp by user
+    if (!otpValue) {
+      return ActionResponse({
+        success: false,
+        errorMsg: "OTP field is required!",
+      });
+    }
+
+    const { data } = await verifyUser();
+    const user = data as IUser;
+
+    //connect database
+    await connectDB();
+
+    const otp = await Otp.findOne({ userId: user._id });
+
+    if (!otp)
+      return ActionResponse({
+        success: false,
+        errorMsg: "Invalid OTP!",
+      });
+
+    //check otp
+    if (otp.code !== otpValue) {
+      return ActionResponse({
+        success: false,
+        errorMsg: "otp not matched!",
+      });
+    }
+
+    //update user
+    await User.findByIdAndUpdate(user._id, {
+      isVerified: true,
+    });
+
+    //delete otp
+    await Otp.findByIdAndDelete(otp._id);
+
+    isSuccess = true;
+    /* return ActionResponse({
+      success: true,
+      message: "OTP verified successfully!",
+    }); */
+  } catch (error) {
+    let errorObj = {};
+    if (error instanceof Error && process.env.NODE_ENV === "development") {
+      errorObj = { message: error.message, stack: error.stack };
+    }
+    return ActionResponse({
+      success: false,
+      errorMsg:
+        error instanceof Error
+          ? error.message
+          : "Failed to verify OTP. Please try again.",
+      ...errorObj,
+    });
+  }
+  if (isSuccess) {
+    redirect("/");
+  }
 }

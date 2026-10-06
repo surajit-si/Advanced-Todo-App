@@ -39,7 +39,7 @@ async function refreshAccessToken(): Promise<boolean> {
   }
 }
 
-async function verifyUser() {
+export async function verifyUser() {
   const cookieStore = await cookies();
 
   const accessToken = cookieStore.get("accessToken");

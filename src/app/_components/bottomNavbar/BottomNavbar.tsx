@@ -24,10 +24,12 @@ export default function BottomNavbar({ className }: { className?: string }) {
   //Update User
   useEffect(() => {
     updateUser().then((curr) => {
+      console.log(curr);
+      
       setUser(curr);
 
       //redirect user if unvarified...
-      if (!curr?.isVerified) {
+      if (curr && !curr?.isVerified) {
         redirect("/verify-email");
       }
     });

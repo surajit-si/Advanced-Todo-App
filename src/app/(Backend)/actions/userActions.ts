@@ -12,6 +12,32 @@ import {
 } from "../lib/jose";
 import { Otp } from "../db/model/Otp.schema";
 import ActionResponse, { IActionResponse } from "../lib/ActionResponse";
+import { errors } from "jose";
+
+async function refreshAccessToken(): Promise<boolean> {
+  const cookieStore = await cookies();
+
+  const userRefreshToken = cookieStore.get("refreshToken");
+  if (!userRefreshToken) return false;
+
+  try {
+    const payload = await verifyToken(userRefreshToken.value);
+    await connectDB();
+
+    const user = await User.findById(payload.userId).select("-password");
+    if (!user) return false;
+
+    const accessToken = await generateAccessToken(user._id.toString());
+    const refreshToken = await generateRefreshToken(user._id.toString());
+
+    cookieStore.set("accessToken", accessToken);
+    cookieStore.set("refreshToken", refreshToken);
+
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 async function verifyUser() {
   const cookieStore = await cookies();
@@ -20,15 +46,37 @@ async function verifyUser() {
   if (!accessToken)
     return ActionResponse({ success: false, errorMsg: "Unauthorized!" });
 
-  const payload = await verifyToken(accessToken.value);
+  let payload;
 
-  if (!payload)
-    return ActionResponse({ success: false, errorMsg: "Invalid token!" });
+  try {
+    payload = await verifyToken(accessToken.value);
+  } catch (error) {
+    if (!(error instanceof errors.JWTExpired)) {
+      return ActionResponse({ success: false, errorMsg: "Invalid token!" });
+    }
+
+    const wasRefreshed = await refreshAccessToken();
+    if (!wasRefreshed) {
+      return ActionResponse({
+        success: false,
+        errorMsg: "Session expired. Please sign in again.",
+      });
+    }
+
+    const refreshedAccessToken = cookieStore.get("accessToken");
+    if (!refreshedAccessToken) {
+      return ActionResponse({
+        success: false,
+        errorMsg: "Failed to refresh the access token.",
+      });
+    }
+
+    payload = await verifyToken(refreshedAccessToken.value);
+  }
 
   await connectDB();
 
   const user = await User.findById(payload.userId).select("-password");
-
   if (!user)
     return ActionResponse({ success: false, errorMsg: "Invalid token!" });
 
@@ -167,6 +215,10 @@ export async function loginUser(formData: FormData) {
 export async function getUser(): Promise<IActionResponse<IUser>> {
   try {
     const response = await verifyUser();
+    if (!response) {
+      return ActionResponse({ success: false, errorMsg: "Unauthorized!" });
+    }
+
     if (!response.success)
       return ActionResponse({ success: false, errorMsg: response.errorMsg });
     const user = response.data as IUser;

@@ -19,10 +19,6 @@ export async function generateRefreshToken(userId: string) {
 }
 
 export async function verifyToken(token: string) {
-  try {
-    const { payload } = await jwtVerify(token, getSecretKey());
-    return payload as { userId: string };
-  } catch (error) {
-    return null;
-  }
+  const { payload } = await jwtVerify(token, getSecretKey());
+  return payload as { userId: string };
 }

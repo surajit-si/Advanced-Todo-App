@@ -5,15 +5,16 @@ import NavButton from "./NavButton";
 import { useEffect, useState } from "react";
 import {
   createLocalStorageTemplate,
-  getLocalData,
-  ITodoApp,
+  createProfile,
+  getLocalUser,
+  IUser,
 } from "./localstorage";
 
 export default function Navbar() {
   const [selectedProfile, setSelectedProfile] = useState<string>("Guest");
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [profiles, setProfiles] = useState<ITodoApp>();
+  const [user, setUser] = useState<IUser>();
 
   //if no account & no localstorage than create localstorage field
   useEffect(() => {
@@ -21,15 +22,20 @@ export default function Navbar() {
   }, []);
 
   const handleProfileCreating = (formData: FormData) => {
-    //
+    const profileName = formData.get("profileName") as string;
+    createProfile(profileName);
+    setUser(getLocalUser());
+
+    setIsCreating(false);
   };
 
   //get the profiles
   useEffect(() => {
     //if not sign-in
-    const todoProfiles = getLocalData();
-    setProfiles(todoProfiles);
+    const todoProfiles = getLocalUser();
+    setUser(todoProfiles);
   }, []);
+
   return (
     <div className="max-sm:h-12 w-full bg-primary flex justify-center items-center text-amber-50 ">
       <div className="shrink-0 w-full flex p-2 gap-2">
@@ -43,10 +49,10 @@ export default function Navbar() {
                 setSelectedProfile(e.target.value);
               }}
             >
-              {profiles?.map((profile, idx) => {
+              {user?.profiles.map((profile, idx) => {
                 return (
-                  <option value={profile.profileName} key={idx}>
-                    {profile.profileName}
+                  <option value={profile.name} key={idx}>
+                    {profile.name}
                   </option>
                 );
               })}

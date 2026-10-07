@@ -18,7 +18,6 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
     name: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    todos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Todo" }],
     profiles: [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }],
     selectedProfile: {
       type: mongoose.Schema.Types.ObjectId,

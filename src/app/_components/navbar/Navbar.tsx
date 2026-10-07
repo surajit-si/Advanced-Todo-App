@@ -1,32 +1,47 @@
 "use client";
 
-import { CirclePlus, SquarePen } from "lucide-react";
+import { CirclePlus, SquarePen, X } from "lucide-react";
 import NavButton from "./NavButton";
 import { useEffect, useState } from "react";
 import {
   createLocalStorageTemplate,
   createProfile,
+  editSelectedProfile,
   getLocalUser,
+  getSelectedProfile,
   IUser,
+  updateSelectedProfile,
 } from "./localstorage";
 
 export default function Navbar() {
-  const [selectedProfile, setSelectedProfile] = useState<string>("Guest");
+  const [selectedProfile, setSelectedProfile] = useState<string>();
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [user, setUser] = useState<IUser>();
 
-  //if no account & no localstorage than create localstorage field
   useEffect(() => {
+    //if no account & no localstorage than create localstorage field
     createLocalStorageTemplate();
+
+    //set user selected profile
+    setSelectedProfile(getSelectedProfile());
   }, []);
 
   const handleProfileCreating = (formData: FormData) => {
     const profileName = formData.get("profileName") as string;
     createProfile(profileName);
     setUser(getLocalUser());
-
     setIsCreating(false);
+  };
+
+  const handleProfileEditing = (formData: FormData) => {
+    const profileName = formData.get("profileName") as string;
+    editSelectedProfile(profileName, selectedProfile as string, () => {
+      setSelectedProfile(profileName);
+      updateSelectedProfile(profileName);
+    });
+    setUser(getLocalUser());
+    setIsEditing(false);
   };
 
   //get the profiles
@@ -47,15 +62,22 @@ export default function Navbar() {
               className=" w-full "
               onChange={(e) => {
                 setSelectedProfile(e.target.value);
+                updateSelectedProfile(e.target.value);
               }}
             >
-              {user?.profiles.map((profile, idx) => {
-                return (
-                  <option value={profile.name} key={idx}>
-                    {profile.name}
-                  </option>
-                );
-              })}
+              {user?.profiles
+                .sort((a, b) => {
+                  if (a.name === user.selsectedProfile) return -1;
+                  if (b.name === user.selsectedProfile) return 1;
+                  return 0;
+                })
+                .map((profile, idx) => {
+                  return (
+                    <option value={profile.name} key={idx}>
+                      {profile.name}
+                    </option>
+                  );
+                })}
             </select>
           </form>
         )}
@@ -73,7 +95,7 @@ export default function Navbar() {
 
         {isEditing && !isCreating && (
           //editing
-          <form action="#" className="flex-1 shrink-0">
+          <form action={handleProfileEditing} className="flex-1 shrink-0">
             <input
               type="text"
               defaultValue={selectedProfile}
@@ -85,13 +107,25 @@ export default function Navbar() {
 
         {/* Edit Button */}
         <NavButton className="">
-          <SquarePen
-            color="#ffffff"
-            onClick={() => {
-              setIsEditing(!isEditing);
-              setIsCreating(false);
-            }}
-          />
+          {!isEditing ? (
+            <SquarePen
+              color="#ffffff"
+              onClick={() => {
+                setIsEditing(!isEditing);
+                setIsCreating(false);
+              }}
+            />
+          ) : (
+            <X
+              color="#ffffff"
+              strokeWidth={2}
+              className="transition-transform duration-300"
+              onClick={() => {
+                setIsEditing(!isEditing);
+                setIsCreating(false);
+              }}
+            />
+          )}
         </NavButton>
         {/* Add Button */}
         <NavButton>

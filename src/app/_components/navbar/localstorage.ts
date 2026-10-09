@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import { Dispatch } from "react";
 
 export type IUser = {
   name: string;
@@ -14,13 +13,13 @@ export type IProfile = {
 
 export type ITodo = {
   task: string;
-  deadline: Date;
+  deadline: Date | null;
   tags: string[];
   isCompleted: boolean;
-  description: string;
+  description?: string;
   createdAt: Date;
   completedAt: Date | null;
-  reminderAt?: Date;
+  reminderAt?: Date | null;
 };
 
 export function createLocalStorageTemplate() {
@@ -99,7 +98,7 @@ export function editSelectedProfile(
 
   //call the executable function
   if (fn) {
-    fn(profileName);
+    fn();
   }
 }
 
@@ -121,3 +120,35 @@ export function updateSelectedProfile(profileName: string) {
   user.selsectedProfile = profileName;
   localStorage.setItem("todoApp", JSON.stringify(user));
 }
+
+export function createTodoLocal({
+  task,
+  description,
+  deadline,
+  tags,
+}: {
+  selectedProfile: string;
+  task: string;
+  description?: string;
+  deadline: Date;
+  tags: string[];
+}) {
+  const gap = deadline.getMilliseconds() - Date.now() <= 1000 * 60;
+
+  const calcDeadline = deadline ? deadline : null;
+
+  const newTodo: ITodo = {
+    task: task.trim(),
+    description: description?.trim(),
+    isCompleted: false,
+    tags: tags,
+    reminderAt: null,
+    completedAt: null,
+    createdAt: new Date(),
+    deadline: gap ? null : deadline,
+  };
+
+  console.log(newTodo);
+}
+
+//give default value to the dateTime-local input

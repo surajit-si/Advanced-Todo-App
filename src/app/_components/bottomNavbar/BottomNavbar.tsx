@@ -12,11 +12,17 @@ import {
   UserPen,
   UserPlus,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { redirect } from "next/navigation";
+import { use, useEffect, useState } from "react";
+import { redirect, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function BottomNavbar({ className }: { className?: string }) {
+  const searchParams = useSearchParams();
+  const isCreating = searchParams.get("isCreating");
+
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+
+  const router = useRouter();
 
   //User
   const { user, setUser } = useUser();
@@ -25,7 +31,7 @@ export default function BottomNavbar({ className }: { className?: string }) {
   useEffect(() => {
     updateUser().then((curr) => {
       console.log(curr);
-      
+
       setUser(curr);
 
       //redirect user if unvarified...
@@ -120,7 +126,16 @@ export default function BottomNavbar({ className }: { className?: string }) {
         </div>
 
         {/* Todo Add Button */}
-        <div className="todoAddButton aspect-square w-14 bg-primary absolute left-1/2 rounded-full -translate-x-1/2 -top-1/2 flex justify-center items-center text-white text-2xl cursor-pointer">
+        <div
+          className="todoAddButton aspect-square w-14 bg-primary absolute left-1/2 rounded-full -translate-x-1/2 -top-1/2 flex justify-center items-center text-white text-2xl cursor-pointer"
+          onClick={() => {
+            if (isCreating == "true") {
+              router.push("?isCreating=false");
+            } else {
+              router.push("?isCreating=true");
+            }
+          }}
+        >
           <CirclePlus />
         </div>
       </div>

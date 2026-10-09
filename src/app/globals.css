@@ -4,6 +4,7 @@
 @theme {
   --color-primary: #3a86ff;
   --color-secondary: #d9d9d9;
+  --color-text-primary: #00000090;
   --color-text-secondary: #0b0b0b;
   --color-danger: #dc3545;
   --color-bg-secondary: #f8f9fa;

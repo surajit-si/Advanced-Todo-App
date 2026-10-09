@@ -12,9 +12,10 @@ import {
   IUser,
   updateSelectedProfile,
 } from "./localstorage";
+import { useProfile } from "@/app/context/ProfileContext";
 
 export default function Navbar() {
-  const [selectedProfile, setSelectedProfile] = useState<string>();
+  const { profile, setProfile } = useProfile();
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [user, setUser] = useState<IUser>();
@@ -24,7 +25,7 @@ export default function Navbar() {
     createLocalStorageTemplate();
 
     //set user selected profile
-    setSelectedProfile(getSelectedProfile());
+    setProfile(getSelectedProfile());
   }, []);
 
   const handleProfileCreating = (formData: FormData) => {
@@ -36,8 +37,8 @@ export default function Navbar() {
 
   const handleProfileEditing = (formData: FormData) => {
     const profileName = formData.get("profileName") as string;
-    editSelectedProfile(profileName, selectedProfile as string, () => {
-      setSelectedProfile(profileName);
+    editSelectedProfile(profileName, profile as string, () => {
+      setProfile(profileName);
       updateSelectedProfile(profileName);
     });
     setUser(getLocalUser());
@@ -61,7 +62,7 @@ export default function Navbar() {
               id="profileSelection"
               className=" w-full "
               onChange={(e) => {
-                setSelectedProfile(e.target.value);
+                setProfile(e.target.value);
                 updateSelectedProfile(e.target.value);
               }}
             >
@@ -98,7 +99,7 @@ export default function Navbar() {
           <form action={handleProfileEditing} className="flex-1 shrink-0">
             <input
               type="text"
-              defaultValue={selectedProfile}
+              defaultValue={profile}
               name="profileName"
               placeholder="Enter new profile name:"
             />

@@ -1,6 +1,5 @@
 "use client";
 
-import { getUserLocalOrFromBackend } from "@/app/utils/user.utild";
 import { useUser } from "../../context/UserContext";
 import {
   CirclePlus,
@@ -15,7 +14,7 @@ import {
 import { use, useEffect, useState } from "react";
 import { redirect, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { getLocalUser } from "../navbar/localstorage";
+import { getPreferedUser } from "@/app/_services/user.services";
 
 export default function BottomNavbar({ className }: { className?: string }) {
   const searchParams = useSearchParams();
@@ -30,26 +29,20 @@ export default function BottomNavbar({ className }: { className?: string }) {
 
   //Update User
   useEffect(() => {
-    const isUserSignedIn = getLocalUser();
+    getPreferedUser().then((curr) => {
+      setUser(curr ?? null);
 
-    if (isUserSignedIn) {
-      setUser({ ...isUserSignedIn, isSignedIn: true });
-    } else {
-      //localStorage
-      setUser({ ...getLocalUser(), isSignedIn: false });
-    }
-
-    /* getUserLocalOrFromBackend().then((curr) => {
-      setUser(curr);
       //redirect user if unvarified...
-      if (curr && !curr?.isVerified) {
+      if (
+        curr &&
+        "isSignedIn" in curr &&
+        curr.isSignedIn &&
+        "isVerified" in curr &&
+        !curr.isVerified
+      ) {
         redirect("/verify-email");
       }
-    }); */
-
-    if (!user?.isVerified && user?.isSignedIn) {
-      redirect("/verify-email");
-    }
+    });
   }, []);
 
   return (
@@ -66,7 +59,6 @@ export default function BottomNavbar({ className }: { className?: string }) {
             className="text-primary cursor-pointer"
             onClick={() => {
               setIsProfileOpen(!isProfileOpen);
-              console.log(user);
             }}
           />
 

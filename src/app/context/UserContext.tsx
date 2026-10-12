@@ -9,17 +9,20 @@ import {
   useState,
 } from "react";
 
-import { IUser } from "../(Backend)/db/model/User.schema";
+import { IUser as BackendUser } from "../(Backend)/db/model/User.schema";
+import { IUser as LocalUser } from "../_components/navbar/localstorage";
+
+type ContextUser = BackendUser | LocalUser;
 
 interface UserContextType {
-  user: IUser | null;
-  setUser: Dispatch<SetStateAction<IUser | null>>;
+  user: ContextUser | null;
+  setUser: Dispatch<SetStateAction<ContextUser | null>>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export default function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<IUser | null>(null);
+  const [user, setUser] = useState<ContextUser | null>(null);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

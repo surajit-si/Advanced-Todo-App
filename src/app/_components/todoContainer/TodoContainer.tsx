@@ -37,7 +37,6 @@ export default function TodoContainer({ className }: { className?: string }) {
       completedAt: 1688006400000, // Example completion timestamp
     },
   ];
-  console.log(user);
 
   return (
     <div

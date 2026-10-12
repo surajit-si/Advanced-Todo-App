@@ -3,44 +3,48 @@
 import { CirclePlus, SquarePen, X } from "lucide-react";
 import NavButton from "./NavButton";
 import { useEffect, useState } from "react";
-import {
-  createLocalStorageTemplate,
-  createProfile,
-  editSelectedProfile,
-  getLocalUser,
-  getSelectedProfile,
-  IUser,
-  updateSelectedProfile,
-} from "./localstorage";
+import { createLocalStorageTemplate, getLocalUser } from "./localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
+import {
+  createPreferedProfile,
+  editPreferedProfile,
+  getPreferedProfile,
+  updatePreferedProfile,
+} from "@/app/_services/profile.services";
+import { useUser } from "@/app/context/UserContext";
 
 export default function Navbar() {
   const { profile, setProfile } = useProfile();
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [user, setUser] = useState<IUser>();
+  const { user, setUser } = useUser();
 
   useEffect(() => {
     //if no account & no localstorage than create localstorage field
     createLocalStorageTemplate();
 
     //set user selected profile
-    setProfile(getSelectedProfile());
+    setProfile(getPreferedProfile(user?.isSignedIn as boolean));
   }, []);
 
   const handleProfileCreating = (formData: FormData) => {
     const profileName = formData.get("profileName") as string;
-    createProfile(profileName);
+    createPreferedProfile(profileName, user?.isSignedIn);
     setUser(getLocalUser());
     setIsCreating(false);
   };
 
   const handleProfileEditing = (formData: FormData) => {
     const profileName = formData.get("profileName") as string;
-    editSelectedProfile(profileName, profile as string, () => {
-      setProfile(profileName);
-      updateSelectedProfile(profileName);
-    });
+    editPreferedProfile(
+      profileName,
+      profile as string,
+      user?.isSignedIn as boolean,
+      () => {
+        setProfile(profileName);
+        updatePreferedProfile(profileName, user?.isSignedIn as boolean);
+      },
+    );
     setUser(getLocalUser());
     setIsEditing(false);
   };
@@ -63,7 +67,10 @@ export default function Navbar() {
               className=" w-full "
               onChange={(e) => {
                 setProfile(e.target.value);
-                updateSelectedProfile(e.target.value);
+                updatePreferedProfile(
+                  e.target.value,
+                  user?.isSignedIn as boolean,
+                );
               }}
             >
               {user?.profiles

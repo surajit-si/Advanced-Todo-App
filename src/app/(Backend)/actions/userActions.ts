@@ -311,8 +311,6 @@ export async function sendOTP(): Promise<{
 
     return ActionResponse({ success: true, message: "OTP sent successfully!" });
   } catch (error) {
-    console.log(error);
-
     let errorObj = {};
     if (error instanceof Error && process.env.NODE_ENV === "development") {
       errorObj = { message: error.message, stack: error.stack };

@@ -4,6 +4,7 @@ export type IUser = {
   name: string;
   profiles: IProfile[];
   selsectedProfile: string;
+  isSignedIn: boolean;
 };
 
 export type IProfile = {
@@ -74,11 +75,7 @@ export function editSelectedProfile(
   fn?: () => void,
 ) {
   const user: IUser = JSON.parse(localStorage.getItem("todoApp") as string);
-  console.log(user);
-
   if (!user) {
-    console.log(selectedProfile);
-
     console.error("user in local storagfe not found!");
     return;
   }
@@ -169,5 +166,4 @@ export function createTodoLocal({
 
   //update localStorage
   localStorage.setItem("todoApp", JSON.stringify(user));
-  console.log(user);
 }

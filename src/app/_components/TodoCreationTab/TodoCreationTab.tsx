@@ -72,7 +72,6 @@ export default function TodoCreationTab({ className }: { className: string }) {
         className="p-0 hidden"
         onChange={(e) => {
           const date = new Date(e.target.value);
-          console.log(date);
           setSelectedDate(date);
         }}
       />

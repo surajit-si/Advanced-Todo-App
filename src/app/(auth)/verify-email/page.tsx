@@ -52,7 +52,7 @@ export default function SignUp() {
 
   function handleSubmit(formData: FormData) {
     verifyOTP(formData).then((res: IActionResponse<any>) => {
-      console.log(res);
+      
 
       if (res.success) {
         setStatus("OTP verified successfully!");

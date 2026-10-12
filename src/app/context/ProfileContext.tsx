@@ -9,12 +9,12 @@ import {
   useState,
 } from "react";
 
-interface UserContextType {
+interface ProfileContextType {
   profile: string;
   setProfile: Dispatch<SetStateAction<string>>;
 }
 
-const ProfileContext = createContext<UserContextType | undefined>(undefined);
+const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export default function ProfileProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<string>("");

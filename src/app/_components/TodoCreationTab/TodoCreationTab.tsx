@@ -5,29 +5,39 @@ import DatetimeInput from "./DatetimeInput";
 import { Info } from "lucide-react";
 import TodoSection from "./TagsSection";
 import { useState } from "react";
-import { createTodoLocal } from "../navbar/localstorage";
+import { createTodoLocal, getLocalUser } from "../navbar/localstorage";
+import { useProfile } from "@/app/context/ProfileContext";
+import { useUser } from "@/app/context/UserContext";
 
 export default function TodoCreationTab({ className }: { className: string }) {
   const [todoTags, setTodoTags] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const { profile } = useProfile();
+  const { user, setUser } = useUser();
 
   const handleSubmit = (formData: FormData) => {
-    console.log(formData);
-    //task, description,dateTime,tag
     const task = formData.get("todo_task") as string;
     const description = formData.get("description") as string;
     const dateTime = formData.get("dateTime");
     const deadline = new Date(dateTime as string);
 
     createTodoLocal({
-      selectedProfile: "",
+      selectedProfile: profile,
       task,
       description,
       deadline,
       tags: todoTags,
     });
     setTodoTags([]);
+    setUser(getLocalUser());
   };
+
+  //default dateTime
+  function getLocalDatetimeString(date = new Date()) {
+    const tzOffset = date.getTimezoneOffset() * 60000;
+    const localDate = new Date(date.getTime() - tzOffset);
+    return localDate.toISOString().slice(0, 16);
+  }
 
   return (
     <form
@@ -55,7 +65,7 @@ export default function TodoCreationTab({ className }: { className: string }) {
         type="datetime-local"
         name="dateTime"
         id="dateTime"
-        // required={false}
+        defaultValue={getLocalDatetimeString()}
         parentClassName="h-0 w-0 p-0 hidden"
         tabIndex={-1}
         lebelClassName="text-text-primary p-0 hidden"
@@ -63,7 +73,6 @@ export default function TodoCreationTab({ className }: { className: string }) {
         onChange={(e) => {
           const date = new Date(e.target.value);
           console.log(date);
-          
           setSelectedDate(date);
         }}
       />

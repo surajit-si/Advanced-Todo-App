@@ -1,6 +1,6 @@
 "use client";
 
-import { updateUser } from "@/app/utils/user.utild";
+import { getUserLocalOrFromBackend } from "@/app/utils/user.utild";
 import { useUser } from "../../context/UserContext";
 import {
   CirclePlus,
@@ -15,6 +15,7 @@ import {
 import { use, useEffect, useState } from "react";
 import { redirect, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { getLocalUser } from "../navbar/localstorage";
 
 export default function BottomNavbar({ className }: { className?: string }) {
   const searchParams = useSearchParams();
@@ -29,16 +30,26 @@ export default function BottomNavbar({ className }: { className?: string }) {
 
   //Update User
   useEffect(() => {
-    updateUser().then((curr) => {
-      console.log(curr);
+    const isUserSignedIn = getLocalUser();
 
+    if (isUserSignedIn) {
+      setUser({ ...isUserSignedIn, isSignedIn: true });
+    } else {
+      //localStorage
+      setUser({ ...getLocalUser(), isSignedIn: false });
+    }
+
+    /* getUserLocalOrFromBackend().then((curr) => {
       setUser(curr);
-
       //redirect user if unvarified...
       if (curr && !curr?.isVerified) {
         redirect("/verify-email");
       }
-    });
+    }); */
+
+    if (!user?.isVerified && user?.isSignedIn) {
+      redirect("/verify-email");
+    }
   }, []);
 
   return (

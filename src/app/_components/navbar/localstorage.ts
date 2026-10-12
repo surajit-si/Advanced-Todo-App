@@ -32,6 +32,7 @@ export function createLocalStorageTemplate() {
         name: "GUEST",
         selsectedProfile: "Guest",
         profiles: [{ name: "Guest", todos: [] }],
+        isSignedIn: false,
       }),
     );
   }
@@ -126,6 +127,7 @@ export function createTodoLocal({
   description,
   deadline,
   tags,
+  selectedProfile,
 }: {
   selectedProfile: string;
   task: string;
@@ -135,7 +137,7 @@ export function createTodoLocal({
 }) {
   const gap = deadline.getMilliseconds() - Date.now() <= 1000 * 60;
 
-  const calcDeadline = deadline ? deadline : null;
+  // const calcDeadline = deadline ? deadline : null;
 
   const newTodo: ITodo = {
     task: task.trim(),
@@ -148,7 +150,24 @@ export function createTodoLocal({
     deadline: gap ? null : deadline,
   };
 
-  console.log(newTodo);
-}
+  //get local user
+  const user = getLocalUser();
 
-//give default value to the dateTime-local input
+  // find the profile that is editing
+  const profileIdx = user.profiles.findIndex((val) => {
+    return val.name === selectedProfile;
+  });
+
+  if (profileIdx === -1) {
+    return console.log("no profile found");
+  }
+
+  user.profiles[profileIdx].todos = [
+    ...user.profiles[profileIdx].todos,
+    newTodo,
+  ];
+
+  //update localStorage
+  localStorage.setItem("todoApp", JSON.stringify(user));
+  console.log(user);
+}

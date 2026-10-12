@@ -1,3 +1,6 @@
+"use client";
+
+import { useUser } from "@/app/context/UserContext";
 import Todo from "./Todo";
 
 export type Todo = {
@@ -9,7 +12,14 @@ export type Todo = {
   completedAt?: number;
   reminderAt?: number[];
 };
+
+const selectedTags: string[] = ["shopping", "errands"];
+
+
+
 export default function TodoContainer({ className }: { className?: string }) {
+  const { user } = useUser();
+
   const todoList: Todo[] = [
     {
       task: "Buy groceries",
@@ -27,6 +37,8 @@ export default function TodoContainer({ className }: { className?: string }) {
       completedAt: 1688006400000, // Example completion timestamp
     },
   ];
+  console.log(user);
+
   return (
     <div
       className={`${className} todo-container flex flex-col w-full h-max overflow-y-scroll`}

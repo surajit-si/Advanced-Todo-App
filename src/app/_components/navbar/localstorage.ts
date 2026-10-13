@@ -3,7 +3,8 @@ import { useRouter } from "next/router";
 export type IUser = {
   name: string;
   profiles: IProfile[];
-  selsectedProfile: string;
+  selectedProfile: string;
+  selsectedProfile?: string;
   isSignedIn: boolean;
 };
 
@@ -31,7 +32,7 @@ export function createLocalStorageTemplate() {
       "todoApp",
       JSON.stringify({
         name: "GUEST",
-        selsectedProfile: "Guest",
+        selectedProfile: "Guest",
         profiles: [{ name: "Guest", todos: [] }],
         isSignedIn: false,
       }),
@@ -105,7 +106,16 @@ export function getSelectedProfile(): string {
   if (!user) {
     console.error("user in local storagfe not found!");
   }
-  return user.selsectedProfile;
+
+  const selectedProfile =
+    user.selectedProfile ?? user.selsectedProfile ?? "Guest";
+  if (user.selectedProfile !== selectedProfile) {
+    user.selectedProfile = selectedProfile;
+    delete user.selsectedProfile;
+    localStorage.setItem("todoApp", JSON.stringify(user));
+  }
+
+  return selectedProfile;
 }
 
 export function updateSelectedProfile(profileName: string) {
@@ -115,7 +125,8 @@ export function updateSelectedProfile(profileName: string) {
     return;
   }
 
-  user.selsectedProfile = profileName;
+  user.selectedProfile = profileName;
+  delete user.selsectedProfile;
   localStorage.setItem("todoApp", JSON.stringify(user));
 }
 

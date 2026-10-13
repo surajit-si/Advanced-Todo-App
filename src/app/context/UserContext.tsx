@@ -12,7 +12,7 @@ import {
 import { IUser as BackendUser } from "../(Backend)/db/model/User.schema";
 import { IUser as LocalUser } from "../_components/navbar/localstorage";
 
-type ContextUser = BackendUser | LocalUser;
+type ContextUser = LocalUser | BackendUser;
 
 interface UserContextType {
   user: ContextUser | null;

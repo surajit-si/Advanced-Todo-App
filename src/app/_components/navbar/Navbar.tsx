@@ -3,7 +3,11 @@
 import { CirclePlus, SquarePen, X } from "lucide-react";
 import NavButton from "./NavButton";
 import { useEffect, useState } from "react";
-import { createLocalStorageTemplate, getLocalUser } from "./localstorage";
+import {
+  createLocalStorageTemplate,
+  getLocalUser,
+  IUser,
+} from "./localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
 import {
   createPreferedProfile,
@@ -18,6 +22,7 @@ export default function Navbar() {
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const { user, setUser } = useUser();
+  const localUser = user as IUser | null;
 
   useEffect(() => {
     //if no account & no localstorage than create localstorage field
@@ -73,10 +78,10 @@ export default function Navbar() {
                 );
               }}
             >
-              {user?.profiles
+              {localUser?.profiles
                 .sort((a, b) => {
-                  if (a.name === user.selsectedProfile) return -1;
-                  if (b.name === user.selsectedProfile) return 1;
+                  if (a.name === localUser.selectedProfile) return -1;
+                  if (b.name === localUser.selectedProfile) return 1;
                   return 0;
                 })
                 .map((profile, idx) => {

@@ -2,6 +2,7 @@
 
 import { useUser } from "@/app/context/UserContext";
 import Todo from "./Todo";
+import { IProfile, ITodo, IUser } from "../navbar/localstorage";
 
 export type Todo = {
   task: string;
@@ -15,28 +16,32 @@ export type Todo = {
 
 const selectedTags: string[] = ["shopping", "errands"];
 
-
-
 export default function TodoContainer({ className }: { className?: string }) {
   const { user } = useUser();
+  const localUser = user as IUser | null;
 
-  const todoList: Todo[] = [
-    {
-      task: "Buy groceries",
-      deadline: 1688006400000, // Example timestamp
-      tags: ["shopping", "errands"],
-      state: "pending",
-      description: "Buy milk, eggs, and bread.",
-      reminderAt: [1687920000000], // Example reminder timestamp
-    },
-    {
-      task: "Finish project report",
-      deadline: 1688092800000, // Example timestamp
-      tags: ["work", "urgent"],
-      state: "completed",
-      completedAt: 1688006400000, // Example completion timestamp
-    },
-  ];
+  const selectedIdx = localUser?.profiles.findIndex((val) => {
+    return val.name === localUser?.selectedProfile;
+  });
+
+  const todoList: Todo[] =
+    localUser && selectedIdx !== undefined && selectedIdx >= 0
+      ? localUser.profiles[selectedIdx].todos.map((todo: ITodo) => ({
+          task: todo.task,
+          deadline: todo.deadline
+            ? new Date(todo.deadline).getTime()
+            : Date.now(),
+          tags: todo.tags ?? [],
+          state: todo.isCompleted ? "completed" : "pending",
+          description: todo.description,
+          completedAt: todo.completedAt
+            ? new Date(todo.completedAt).getTime()
+            : undefined,
+          reminderAt: todo.reminderAt
+            ? [new Date(todo.reminderAt).getTime()]
+            : undefined,
+        }))
+      : [];
 
   return (
     <div

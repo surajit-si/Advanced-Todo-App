@@ -212,7 +212,9 @@ export async function loginUser(formData: FormData) {
   }
 }
 
-export async function getUser(): Promise<IActionResponse<IUser>> {
+export async function getUser(): Promise<
+  IActionResponse<Omit<IUser, "password">>
+> {
   try {
     const response = await verifyUser();
     if (!response) {
@@ -229,6 +231,7 @@ export async function getUser(): Promise<IActionResponse<IUser>> {
         _id: user._id.toString(),
         name: user.name,
         email: user.email,
+        isSignedIn: user.isSignedIn,
         isVerified: user.isVerified,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
@@ -238,32 +241,29 @@ export async function getUser(): Promise<IActionResponse<IUser>> {
       },
     });
   } catch (error) {
-    let errorObj = {};
-    if (error instanceof Error && process.env.NODE_ENV === "development") {
-      errorObj = { message: error.message, stack: error.stack };
-    }
     return ActionResponse({
       success: false,
       dev:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === "development" && error instanceof Error
           ? {
-              name: errorObj.name,
-              stack: errorObj.stack,
+              name: error.name,
+              stack: error.stack,
             }
           : undefined,
     });
   }
 }
 
-export async function sendOTP(): Promise<{
-  success: boolean;
-  data?: { reminingTime: number };
-  error?: string;
-  message?: string;
-}> {
+export async function sendOTP(): Promise<
+  IActionResponse<{ reminingTime: number }>
+> {
   try {
     const response = await verifyUser();
-    if (!response.success) return response;
+    if (!response.success)
+      return ActionResponse<{ reminingTime: number }>({
+        success: false,
+        errorMsg: response.errorMsg,
+      });
     const user = response.data as IUser;
 
     //check if otp already exgists
@@ -283,7 +283,7 @@ export async function sendOTP(): Promise<{
     //check if in cooldown
     //send remining time
     if (otpExists && resendCondition < 60)
-      return ActionResponse({
+      return ActionResponse<{ reminingTime: number }>({
         success: false,
         errorMsg: "Please wait sometimes before resending OTP.",
         data: { reminingTime: Math.ceil(60 - resendCondition) },
@@ -309,28 +309,28 @@ export async function sendOTP(): Promise<{
       await otpExists.save();
     }
 
-    return ActionResponse({ success: true, message: "OTP sent successfully!" });
+    return ActionResponse<{ reminingTime: number }>({
+      success: true,
+      message: "OTP sent successfully!",
+    });
   } catch (error) {
-    let errorObj = {};
-    if (error instanceof Error && process.env.NODE_ENV === "development") {
-      errorObj = { message: error.message, stack: error.stack };
-    }
-
     return ActionResponse({
       success: false,
       errorMsg: "Failed to send OTP. Please try again.",
       dev:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === "development" && error instanceof Error
           ? {
-              name: errorObj.name,
-              stack: errorObj.stack,
+              name: error.name,
+              stack: error.stack,
             }
           : undefined,
     });
   }
 }
 
-export async function verifyOTP(formDate: FormData) {
+export async function verifyOTP(
+  formDate: FormData,
+): Promise<IActionResponse<unknown>> {
   let isSuccess = false;
   try {
     const otpValue = formDate.get("otp");
@@ -394,4 +394,9 @@ export async function verifyOTP(formDate: FormData) {
   if (isSuccess) {
     redirect("/");
   }
+
+  return ActionResponse({
+    success: false,
+    errorMsg: "Failed to verify OTP. Please try again.",
+  });
 }

@@ -57,7 +57,7 @@ export default function SignUp() {
       if (res.success) {
         setStatus("OTP verified successfully!");
       } else {
-        setStatus(res.errorMsg);
+        setStatus(res.errorMsg ?? "Failed to verify OTP.");
       }
     });
   }

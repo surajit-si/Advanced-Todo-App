@@ -5,6 +5,7 @@ import Todo from "./Todo";
 import { IProfile, ITodo, IUser } from "../navbar/localstorage";
 import { filterByTag } from "@/app/utils/filter.utils";
 import { useSelectedTags } from "@/app/context/SelectedTagsContext";
+import { useProfile } from "@/app/context/ProfileContext";
 
 export type Todo = {
   task: string;
@@ -18,10 +19,11 @@ export type Todo = {
 
 export default function TodoContainer({ className }: { className?: string }) {
   const { user } = useUser();
+  const { profile } = useProfile();
   const localUser = user as IUser | null;
 
   const selectedIdx = localUser?.profiles.findIndex((val) => {
-    return val.name === localUser?.selectedProfile;
+    return val.name === profile;
   });
 
   const todoList: Todo[] =
@@ -54,9 +56,25 @@ export default function TodoContainer({ className }: { className?: string }) {
     <div
       className={`${className} todo-container flex flex-col w-full h-max overflow-y-scroll`}
     >
-      {filteredTodoList.map((todo, idx) => {
-        return <Todo todo={todo} idx={idx} key={idx} />;
-      })}
+      {filteredTodoList.length > 0 ? (
+        filteredTodoList.map((todo, idx) => {
+          return <Todo todo={todo} idx={idx} key={idx} />;
+        })
+      ) : (
+        <Todo
+          todo={{
+            task: "No tasks available.",
+            deadline: 0,
+            tags: [],
+            state: "pending",
+            description: "",
+            completedAt: undefined,
+            reminderAt: undefined,
+          }}
+          idx={0}
+          key={0}
+        />
+      )}
     </div>
   );
 }

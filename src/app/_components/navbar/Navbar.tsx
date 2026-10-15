@@ -16,6 +16,7 @@ import {
   updatePreferedProfile,
 } from "@/app/_services/profile.services";
 import { useUser } from "@/app/context/UserContext";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const { profile, setProfile } = useProfile();
@@ -23,6 +24,8 @@ export default function Navbar() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const { user, setUser } = useUser();
   const localUser = user as IUser | null;
+
+  const router = useRouter();
 
   useEffect(() => {
     //if no account & no localstorage than create localstorage field

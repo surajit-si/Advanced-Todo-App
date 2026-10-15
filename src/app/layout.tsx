@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import UserProvider from "./context/UserContext";
 import ProfileProvider from "./context/ProfileContext";
+import SelectedTagsContextProvider from "./context/SelectedTagsContext";
 
 export const metadata: Metadata = {
   title: "Advanced Todo App",
@@ -13,9 +14,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="openSansFont ">
       <body className="min-h-dvh flex flex-col items-center ">
-        <ProfileProvider>
-          <UserProvider>{children}</UserProvider>
-        </ProfileProvider>
+        <SelectedTagsContextProvider>
+          <ProfileProvider>
+            <UserProvider>{children}</UserProvider>
+          </ProfileProvider>
+        </SelectedTagsContextProvider>
       </body>
     </html>
   );

@@ -1,14 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Tab from "./Tag";
-import { title } from "process";
+import { useSelectedTags } from "@/app/context/SelectedTagsContext";
 
 export default function TagList({ className }: { className?: string }) {
   type Tags = {
     tagName: string;
   };
 
-  const [currentTag, setCurrentTag] = useState<string>("All");
+  const { selectedTags, setSelectedTags } = useSelectedTags();
+  // const [currentTag, setCurrentTag] = useState<string>("All");
+
+  //default selected tag
+  useEffect(() => {
+    setSelectedTags("All");
+  }, []);
 
   const list: Tags[] = [
     { tagName: "All" },
@@ -17,7 +23,7 @@ export default function TagList({ className }: { className?: string }) {
   ];
 
   function handleOnClick({ title }: { title: string }) {
-    setCurrentTag(title);
+    setSelectedTags(title);
   }
 
   return (
@@ -31,7 +37,7 @@ export default function TagList({ className }: { className?: string }) {
             onClick={() => {
               handleOnClick({ title: tag.tagName });
             }}
-            className={`${tag.tagName === currentTag ? "bg-primary/50!" : "bg-secondary!"}`}
+            className={`${tag.tagName === selectedTags ? "bg-primary/50!" : "bg-secondary!"}`}
             key={tag.tagName}
           />
         );

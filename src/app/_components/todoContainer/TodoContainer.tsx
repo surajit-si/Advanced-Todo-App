@@ -3,6 +3,8 @@
 import { useUser } from "@/app/context/UserContext";
 import Todo from "./Todo";
 import { IProfile, ITodo, IUser } from "../navbar/localstorage";
+import { filterByTag } from "@/app/utils/filter.utils";
+import { useSelectedTags } from "@/app/context/SelectedTagsContext";
 
 export type Todo = {
   task: string;
@@ -13,8 +15,6 @@ export type Todo = {
   completedAt?: number;
   reminderAt?: number[];
 };
-
-const selectedTags: string[] = ["shopping", "errands"];
 
 export default function TodoContainer({ className }: { className?: string }) {
   const { user } = useUser();
@@ -43,11 +43,18 @@ export default function TodoContainer({ className }: { className?: string }) {
         }))
       : [];
 
+  const { selectedTags } = useSelectedTags();
+
+  const filteredTodoList: Todo[] = filterByTag({
+    rawTodo: todoList,
+    tag: selectedTags,
+  });
+
   return (
     <div
       className={`${className} todo-container flex flex-col w-full h-max overflow-y-scroll`}
     >
-      {todoList.map((todo, idx) => {
+      {filteredTodoList.map((todo, idx) => {
         return <Todo todo={todo} idx={idx} key={idx} />;
       })}
     </div>

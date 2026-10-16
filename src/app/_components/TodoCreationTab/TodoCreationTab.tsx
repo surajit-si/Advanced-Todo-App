@@ -8,6 +8,7 @@ import { useState } from "react";
 import { createTodoLocal, getLocalUser } from "../../utils/localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
 import { useUser } from "@/app/context/UserContext";
+import { useRouter } from "next/navigation";
 
 export default function TodoCreationTab({ className }: { className: string }) {
   const [todoTags, setTodoTags] = useState<string[]>([]);
@@ -39,10 +40,15 @@ export default function TodoCreationTab({ className }: { className: string }) {
     return localDate.toISOString().slice(0, 16);
   }
 
+  const router = useRouter();
+
   return (
     <form
       action={handleSubmit}
-      className={`${className} w-[calc(100%-1rem)] max-w-108 border p-4 rounded-lg shadow-md bg-white flex flex-col gap-2 `}
+      onSubmit={() => {
+        router.push("?isCreating=false");
+      }}
+      className={`${className} w-[calc(100%-1rem)] max-w-108 p-4 rounded-lg bg-white flex flex-col gap-2 shadow-[0_0_20px_rgba(0,0,0,0.6)]`}
     >
       <BetterInput
         type="text"

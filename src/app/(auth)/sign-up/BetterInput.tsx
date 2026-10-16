@@ -14,6 +14,7 @@ export default function BetterInput({
   onKeyDown,
   tabIndex,
   required = true,
+  autoComplete = "off",
 }: {
   type: HTMLInputTypeAttribute;
   className?: string;
@@ -28,6 +29,7 @@ export default function BetterInput({
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   tabIndex?: number;
   required?: boolean;
+  autoComplete?: "on" | "off";
 }) {
   const uniqueId = useId();
 
@@ -44,6 +46,7 @@ export default function BetterInput({
         onKeyDown={onKeyDown}
         tabIndex={tabIndex}
         required={required}
+        autoComplete={autoComplete}
       />
       {placeholder && (
         <label

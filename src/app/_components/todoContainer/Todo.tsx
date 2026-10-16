@@ -10,6 +10,7 @@ import {
 import { useUser } from "@/app/context/UserContext";
 import { getPreferedUser } from "@/app/_services/user.services";
 import { IUser } from "@/app/utils/localstorage";
+import DeletePopup from "../deleteButton/DeletePopup";
 
 export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -41,13 +42,17 @@ export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
     setUser((await getPreferedUser()) as IUser);
   }
 
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   async function handleDelete(e: MouseEvent<HTMLSpanElement>) {
     e.stopPropagation();
 
-    if (user) {
-      deletePreferedTodo(todo.id, user.isSignedIn);
-    }
-    setUser((await getPreferedUser()) as IUser);
+    //delete popup
+    setIsDeleting(true);
+  }
+
+  function handleEdit(e: MouseEvent<HTMLSpanElement>) {
+    e.stopPropagation();
+    alert("Editing is not implemented yet.");
   }
 
   return (
@@ -104,11 +109,34 @@ export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
             <Trash className="text-danger cursor-pointer shrink-0 h-7 w-7 p-1 content-box rounded-sm hover:bg-[#0000002c]! transition-colors duration-200" />
           </span>
 
-          <span title="Edit">
+          <span title="Edit" onClick={handleEdit}>
             <Pencil className="text-black cursor-pointer shrink-0 h-7 w-7 p-1 content-box rounded-sm hover:bg-[#0000002c]! transition-colors duration-200" />
           </span>
         </span>
       </div>
+      {/* Delete popup */}
+      {isDeleting && (
+        <DeletePopup
+          contsiner={document.body}
+          leftSideButtonName="Cancel"
+          leftSideButtonClassName="text-primary"
+          rightSideButtonName="Delete"
+          rightSideButtonClassName="text-white bg-danger"
+          className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2"
+          leftSideButtonCallback={() => {
+            setIsDeleting(false);
+          }}
+          rightSideButtonCallback={async () => {
+            if (user) {
+              deletePreferedTodo(todo.id, user.isSignedIn);
+            }
+            setUser((await getPreferedUser()) as IUser);
+            setIsDeleting(false);
+          }}
+        >
+          <h2 className="text-xl">Do you want to delete?</h2>
+        </DeletePopup>
+      )}
 
       {/* Description */}
 

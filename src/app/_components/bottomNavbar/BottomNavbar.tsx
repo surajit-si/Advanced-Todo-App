@@ -11,7 +11,7 @@ import {
   UserPen,
   UserPlus,
 } from "lucide-react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { redirect, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { getPreferedUser } from "@/app/_services/user.services";

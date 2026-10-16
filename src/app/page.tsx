@@ -12,7 +12,7 @@ export default async function Home({
 }) {
   const { isCreating, isDeleting } = await searchParams;
   const showCreationTab = isCreating === "true";
-  const showDeletingTab = isDeleting === "true";
+  // const showDeletingTab = isDeleting === "true";
 
   return (
     <div className="w-full h-screen border relative">
@@ -26,7 +26,8 @@ export default async function Home({
       {/* Bottom Navbar */}
       <BottomNavbar className="" />
       {/* Delete Button */}
-      {showDeletingTab && (
+
+      {/* {showDeletingTab && (
         <DeletePopup
           leftSideButtonName="Cancel"
           leftSideButtonClassName="text-primary"
@@ -36,7 +37,7 @@ export default async function Home({
         >
           <h1 className="text-2xl">Are you sure?</h1>
         </DeletePopup>
-      )}
+      )} */}
 
       {showCreationTab && (
         <TodoCreationTab className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />

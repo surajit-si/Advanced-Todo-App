@@ -1,5 +1,4 @@
 import BottomNavbar from "./_components/bottomNavbar/BottomNavbar";
-import DeletePopup from "./_components/deleteButton/DeletePopup";
 import Navbar from "./_components/navbar/Navbar";
 import TagList from "./_components/tabList/TagList";
 import TodoContainer from "./_components/todoContainer/TodoContainer";

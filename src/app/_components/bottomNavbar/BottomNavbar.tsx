@@ -17,6 +17,13 @@ import { useRouter } from "next/navigation";
 import { getPreferedUser } from "@/app/_services/user.services";
 
 export default function BottomNavbar({ className }: { className?: string }) {
+  // alert
+  useEffect(() => {
+    if (process.env.NODE_ENV != "development") {
+      alert("The app is still under development. You may see bugs.");
+    }
+  }, []);
+
   const searchParams = useSearchParams();
   const isCreating = searchParams.get("isCreating");
 

@@ -5,7 +5,7 @@ import DatetimeInput from "./DatetimeInput";
 import { Info } from "lucide-react";
 import TodoSection from "./TagsSection";
 import { useState } from "react";
-import { createTodoLocal, getLocalUser } from "../navbar/localstorage";
+import { createTodoLocal, getLocalUser } from "../../utils/localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
 import { useUser } from "@/app/context/UserContext";
 

@@ -3,7 +3,7 @@ import {
   editSelectedProfile,
   getSelectedProfile,
   updateSelectedProfile,
-} from "../_components/navbar/localstorage";
+} from "../utils/localstorage";
 
 export const createPreferedProfile = (
   profileName: string,
@@ -47,4 +47,3 @@ export const updatePreferedProfile = (
     updateSelectedProfile(profileName);
   }
 };
-

@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 
 export type IUser = {
+  id: string;
   name: string;
   profiles: IProfile[];
   selectedProfile: string;
@@ -9,11 +10,13 @@ export type IUser = {
 };
 
 export type IProfile = {
+  id: string;
   name: string;
   todos: ITodo[];
 };
 
 export type ITodo = {
+  id: string;
   task: string;
   deadline: Date | null;
   tags: string[];
@@ -28,15 +31,15 @@ export function createLocalStorageTemplate() {
   const todoApp = window.localStorage.getItem("todoApp");
 
   if (!todoApp) {
-    window.localStorage.setItem(
-      "todoApp",
-      JSON.stringify({
-        name: "GUEST",
-        selectedProfile: "Guest",
-        profiles: [{ name: "Guest", todos: [] }],
-        isSignedIn: false,
-      }),
-    );
+    const newUser: IUser = {
+      id: crypto.randomUUID(),
+      name: "GUEST",
+      profiles: [{ id: crypto.randomUUID(), name: "Guest", todos: [] }],
+      selectedProfile: "Guest",
+      isSignedIn: false,
+    };
+
+    window.localStorage.setItem("todoApp", JSON.stringify(newUser));
   }
 }
 
@@ -61,7 +64,10 @@ export function createProfile(profileName: string) {
 
   const newuser: IUser = {
     ...user,
-    profiles: [...user.profiles, { name: profileName, todos: [] }],
+    profiles: [
+      ...user.profiles,
+      { id: crypto.randomUUID(), name: profileName, todos: [] },
+    ],
   };
 
   localStorage.setItem("todoApp", JSON.stringify(newuser));
@@ -148,6 +154,7 @@ export function createTodoLocal({
   // const calcDeadline = deadline ? deadline : null;
 
   const newTodo: ITodo = {
+    id: crypto.randomUUID(),
     task: task.trim(),
     description: description?.trim(),
     isCompleted: false,
@@ -174,6 +181,56 @@ export function createTodoLocal({
     ...user.profiles[profileIdx].todos,
     newTodo,
   ];
+
+  //update localStorage
+  localStorage.setItem("todoApp", JSON.stringify(user));
+}
+
+export function deleteTodoLocal(todoId: string) {
+  const user = getLocalUser();
+
+  const profileIdx = user.profiles.findIndex((val) => {
+    return val.name === user.selectedProfile;
+  });
+
+  if (profileIdx === -1) {
+    return console.log("no profile found");
+  }
+
+  user.profiles[profileIdx].todos = user.profiles[profileIdx].todos.filter(
+    (todo) => todo.id !== todoId,
+  );
+
+  //update localStorage
+  localStorage.setItem("todoApp", JSON.stringify(user));
+}
+
+export function markTodoLocalState(
+  todoId: string,
+  state: "completed" | "pending",
+) {
+  const user = getLocalUser();
+
+  const profileIdx = user.profiles.findIndex((val) => {
+    return val.name === user.selectedProfile;
+  });
+
+  if (profileIdx === -1) {
+    return console.log("no profile found");
+  }
+
+  user.profiles[profileIdx].todos = user.profiles[profileIdx].todos.map(
+    (todo) => {
+      if (todo.id === todoId) {
+        return {
+          ...todo,
+          isCompleted: state === "completed",
+          completedAt: state === "completed" ? new Date() : null,
+        };
+      }
+      return todo;
+    },
+  );
 
   //update localStorage
   localStorage.setItem("todoApp", JSON.stringify(user));

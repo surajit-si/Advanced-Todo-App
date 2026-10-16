@@ -2,12 +2,13 @@
 
 import { useUser } from "@/app/context/UserContext";
 import Todo from "./Todo";
-import { IProfile, ITodo, IUser } from "../navbar/localstorage";
+import { ITodo, IUser } from "../../utils/localstorage";
 import { filterByTag } from "@/app/utils/filter.utils";
 import { useSelectedTags } from "@/app/context/SelectedTagsContext";
 import { useProfile } from "@/app/context/ProfileContext";
 
 export type Todo = {
+  id: string;
   task: string;
   deadline: number;
   tags: string[];
@@ -29,6 +30,7 @@ export default function TodoContainer({ className }: { className?: string }) {
   const todoList: Todo[] =
     localUser && selectedIdx !== undefined && selectedIdx >= 0
       ? localUser.profiles[selectedIdx].todos.map((todo: ITodo) => ({
+          id: todo.id,
           task: todo.task,
           deadline: todo.deadline
             ? new Date(todo.deadline).getTime()
@@ -63,6 +65,7 @@ export default function TodoContainer({ className }: { className?: string }) {
       ) : (
         <Todo
           todo={{
+            id: "no-tasks",
             task: "No tasks available.",
             deadline: 0,
             tags: [],

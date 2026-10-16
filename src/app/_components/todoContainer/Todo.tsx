@@ -1,8 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import { type Todo } from "./TodoContainer";
-import { ChevronUp, Pencil, Trash } from "lucide-react";
+import { CheckCheck, ChevronUp, Pencil, Trash, X } from "lucide-react";
+import {
+  deletePreferedTodo,
+  markPreferedTodoState,
+} from "@/app/_services/todo.services";
+import { useUser } from "@/app/context/UserContext";
+import { getPreferedUser } from "@/app/_services/user.services";
+import { IUser } from "@/app/utils/localstorage";
 
 export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -19,6 +26,29 @@ export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
   // Works everywhere without TS target warnings:
   const finalTitle = (str: string) =>
     str.replace(/^([\s\S]{13})[\s\S]{3,}$/, "$1...");
+
+  const { user, setUser } = useUser();
+
+  async function handleMarkCheck(e: MouseEvent<HTMLSpanElement>) {
+    e.stopPropagation();
+    markPreferedTodoState(todo.id, "completed", user?.isSignedIn as boolean);
+    setUser((await getPreferedUser()) as IUser);
+  }
+
+  async function handleMarkPending(e: MouseEvent<HTMLSpanElement>) {
+    e.stopPropagation();
+    markPreferedTodoState(todo.id, "pending", user?.isSignedIn as boolean);
+    setUser((await getPreferedUser()) as IUser);
+  }
+
+  async function handleDelete(e: MouseEvent<HTMLSpanElement>) {
+    e.stopPropagation();
+
+    if (user) {
+      deletePreferedTodo(todo.id, user.isSignedIn);
+    }
+    setUser((await getPreferedUser()) as IUser);
+  }
 
   return (
     <div
@@ -54,8 +84,29 @@ export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
         </span>
         {/* Buttons */}
         <span className="absolute right-2 inline-flex items-center gap-3 p-2 min-w-max whitespace-nowrap">
-          <Trash className="text-danger cursor-pointer shrink-0 h-7 w-7 p-1 content-box rounded-sm hover:bg-[#0000002c]! transition-colors duration-200" />
-          <Pencil className="text-black cursor-pointer shrink-0 h-7 w-7 p-1 content-box rounded-sm hover:bg-[#0000002c]! transition-colors duration-200" />
+          {todo.state !== "completed" ? (
+            <span title="Mark as completed" onClick={handleMarkCheck}>
+              <CheckCheck
+                strokeWidth={2}
+                className="text-success cursor-pointer shrink-0 h-7 w-7 p-1 content-box rounded-sm hover:bg-[#0000002c]! transition-colors duration-200"
+              />
+            </span>
+          ) : (
+            <span title="Mark as pending" onClick={handleMarkPending}>
+              <X
+                strokeWidth={2}
+                className=" cursor-pointer shrink-0 h-7 w-7 p-1 content-box rounded-sm hover:bg-[#0000002c]! transition-colors duration-200"
+              />
+            </span>
+          )}
+
+          <span title="Delete" onClick={handleDelete}>
+            <Trash className="text-danger cursor-pointer shrink-0 h-7 w-7 p-1 content-box rounded-sm hover:bg-[#0000002c]! transition-colors duration-200" />
+          </span>
+
+          <span title="Edit">
+            <Pencil className="text-black cursor-pointer shrink-0 h-7 w-7 p-1 content-box rounded-sm hover:bg-[#0000002c]! transition-colors duration-200" />
+          </span>
         </span>
       </div>
 

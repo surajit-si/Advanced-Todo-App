@@ -1,4 +1,5 @@
 export type Todo = {
+  id: string;
   task: string;
   deadline: number;
   tags: string[];

@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import { IUser as BackendUser } from "../(Backend)/db/model/User.schema";
-import { IUser as LocalUser } from "../_components/navbar/localstorage";
+import { IUser as LocalUser } from "../utils/localstorage";
 
 type ContextUser = LocalUser | Omit<BackendUser, "password">;
 

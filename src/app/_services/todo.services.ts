@@ -1,4 +1,8 @@
-import { createTodoLocal } from "../_components/navbar/localstorage";
+import {
+  createTodoLocal,
+  deleteTodoLocal,
+  markTodoLocalState,
+} from "../utils/localstorage";
 
 export const createPreferedTodo = (
   {
@@ -20,5 +24,25 @@ export const createPreferedTodo = (
     //
   } else {
     createTodoLocal({ task, description, deadline, tags, selectedProfile });
+  }
+};
+
+export const deletePreferedTodo = (todoId: string, isSignedIn: boolean) => {
+  if (isSignedIn) {
+    //
+  } else {
+    deleteTodoLocal(todoId);
+  }
+};
+
+export const markPreferedTodoState = (
+  todoId: string,
+  currentState: "completed" | "pending",
+  isSignedIn: boolean,
+) => {
+  if (isSignedIn) {
+    //
+  } else {
+    markTodoLocalState(todoId, currentState);
   }
 };

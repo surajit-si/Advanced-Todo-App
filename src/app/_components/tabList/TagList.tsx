@@ -4,7 +4,7 @@ import Tab from "./Tag";
 import { useSelectedTags } from "@/app/context/SelectedTagsContext";
 import { useUser } from "@/app/context/UserContext";
 import { useProfile } from "@/app/context/ProfileContext";
-import type { IUser } from "../navbar/localstorage";
+import type { IUser } from "../../utils/localstorage";
 
 export default function TagList({ className }: { className?: string }) {
   const { selectedTags, setSelectedTags } = useSelectedTags();

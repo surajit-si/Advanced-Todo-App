@@ -7,7 +7,7 @@ import {
   createLocalStorageTemplate,
   getLocalUser,
   IUser,
-} from "./localstorage";
+} from "../../utils/localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
 import {
   createPreferedProfile,

@@ -1,7 +1,7 @@
 "use client";
 
 import { getUser } from "../(Backend)/actions/userActions";
-import { getLocalUser } from "../_components/navbar/localstorage";
+import { getLocalUser } from "../utils/localstorage";
 
 export const getPreferedUser = async () => {
   try {

@@ -11,10 +11,12 @@ import {
   UserPen,
   UserPlus,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { redirect, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { getPreferedUser } from "@/app/_services/user.services";
+import { useOutsideClick } from "@/app/utils/useOutsideClick";
+import Link from "next/link";
 
 export default function BottomNavbar({ className }: { className?: string }) {
   // alert
@@ -28,6 +30,14 @@ export default function BottomNavbar({ className }: { className?: string }) {
   const isCreating = searchParams.get("isCreating");
 
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const profileContainerRef = useRef<HTMLDivElement>(null);
+
+  useOutsideClick(
+    profileContainerRef,
+    () => setIsProfileOpen(false),
+    [],
+    isProfileOpen,
+  );
 
   const router = useRouter();
 
@@ -38,6 +48,7 @@ export default function BottomNavbar({ className }: { className?: string }) {
   useEffect(() => {
     getPreferedUser().then((curr) => {
       setUser(curr ?? null);
+      console.log(curr);
 
       //redirect user if unvarified...
       if (
@@ -60,7 +71,7 @@ export default function BottomNavbar({ className }: { className?: string }) {
         {/* Todo Menu */}
         <ClipboardList color="#3A86FF" />
         <span className="dummy hidden"></span>
-        <div className="relative">
+        <div className="relative" ref={profileContainerRef}>
           {/* User Button */}
           <CircleUserRound
             className="text-primary cursor-pointer"
@@ -73,7 +84,7 @@ export default function BottomNavbar({ className }: { className?: string }) {
             <div className="absolute py-4 px-2  top-0 -translate-y-full left-0 -translate-x-full w-60 rounded-2xl z-50 flex flex-col items-center bg-white shadow-[0_0_25px_rgba(0,0,0,0.5)]">
               {/* Photo */}
               <div className="aspect-square w-20 rounded-full overflow-hidden ">
-                {user ? (
+                {user?.isSignedIn ? (
                   <img
                     src={
                       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNaGxAjEhS_6L2RZ9oNBHFxgnv4qJmgp1DMOMDMpeM1w&s=10"
@@ -90,16 +101,18 @@ export default function BottomNavbar({ className }: { className?: string }) {
                 )}
               </div>
               {/* Change avatar button */}
-              <div
-                className={`${!user && "hidden"} border flex rounded-2xl px-2 text-sm text-gray-600 cursor-pointer items-center gap-1 mt-1`}
-              >
-                <UserPen className="text-gray-600 aspect-square w-4" />
-                Change Avatar
-              </div>
+              {user?.isSignedIn && (
+                <div
+                  className={`${!user && "hidden"} border flex rounded-2xl px-2 text-sm text-gray-600 cursor-pointer items-center gap-1 mt-1`}
+                >
+                  <UserPen className="text-gray-600 aspect-square w-4" />
+                  Change Avatar
+                </div>
+              )}
               {/* Buttons */}
               <div className="mt-2 flex gap-2">
                 {/* Delete Button */}
-                {user ? (
+                {user?.isSignedIn ? (
                   <button
                     className={`Delete border border-danger px-4 py-1 rounded-4xl text-danger flex items-center gap-1 text-sm cursor-pointer transition-transform hover:scale-105 duration-200`}
                   >
@@ -107,15 +120,16 @@ export default function BottomNavbar({ className }: { className?: string }) {
                     Delete
                   </button>
                 ) : (
-                  <button
+                  <Link
+                    href={"/sign-up"}
                     className={`Delete border border-primary px-4 py-1 rounded-4xl text-primary flex items-center gap-1 text-sm cursor-pointer transition-transform hover:scale-105 duration-200`}
                   >
                     <UserPlus className="text-primary aspect-square w-4" />
                     Sign Up
-                  </button>
+                  </Link>
                 )}
                 {/* Logout Button */}
-                {user ? (
+                {user?.isSignedIn ? (
                   <button
                     className={`Delete border border-danger px-4 py-1 rounded-4xl text-white flex items-center gap-1 text-sm bg-danger cursor-pointer transition-transform hover:scale-105 duration-200`}
                   >
@@ -123,12 +137,13 @@ export default function BottomNavbar({ className }: { className?: string }) {
                     Logout
                   </button>
                 ) : (
-                  <button
+                  <Link
+                    href={"/sign-in"}
                     className={`Delete border border-primary px-4 py-1 rounded-4xl text-white flex items-center gap-1 text-sm bg-primary cursor-pointer transition-transform hover:scale-105 duration-200`}
                   >
                     <LogIn className="text-white aspect-square w-4" />
                     Sign In
-                  </button>
+                  </Link>
                 )}
               </div>
             </div>

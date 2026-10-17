@@ -36,9 +36,19 @@ export default function SignIn() {
         action={handleSubmit}
         className="flex flex-col gap-2 min-w-60 w-80 max-w-100"
       >
-        <BetterInput type="email" placeholder="Email" name="email" />
+        <BetterInput
+          type="email"
+          placeholder="Email"
+          name="email"
+          autoComplete="on"
+        />
 
-        <BetterInput type="password" placeholder="password" name="password" />
+        <BetterInput
+          type="password"
+          placeholder="password"
+          name="password"
+          autoComplete="off"
+        />
 
         <button
           type="submit"

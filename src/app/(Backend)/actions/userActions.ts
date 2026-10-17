@@ -122,11 +122,22 @@ export async function registerUser(formData: FormData) {
         errorMsg: "Email already in use!",
       });
 
-    await User.create({
+    const user = await User.create({
       name: userName,
       email: email,
       password: password,
     });
+
+    if (user) {
+      //create cookie
+      const accessToken = await generateAccessToken(user._id.toString());
+      const refreshToken = await generateRefreshToken(user._id.toString());
+
+      const cookieStore = await cookies();
+
+      cookieStore.set("accessToken", accessToken);
+      cookieStore.set("refreshToken", refreshToken);
+    }
 
     isSuccess = true;
   } catch (error: unknown) {
@@ -291,7 +302,7 @@ export async function sendOTP(): Promise<
 
     const otp = Math.floor(100000 + Math.random() * 900000);
 
-    await sendEmail({
+    const code = await sendEmail({
       to: user.email,
       subject: "OTP",
       htmlContent: `<p>Your OTP is ${otp}</p>`,

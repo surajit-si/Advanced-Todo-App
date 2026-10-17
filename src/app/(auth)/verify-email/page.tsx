@@ -16,11 +16,10 @@ export default function SignUp() {
 
   //send 1st otp
   useEffect(() => {
-    let isMounted = true; // 🟢 Track mount status
+    let isMounted = true;
     let timer: NodeJS.Timeout;
 
     sendOTP().then((res: IActionResponse<{ reminingTime: number }>) => {
-      // 🟢 Prevent setting timer if unmounted while request was pending
       if (!isMounted) return;
 
       if (!res.success) {
@@ -45,15 +44,13 @@ export default function SignUp() {
     });
 
     return () => {
-      isMounted = false; // 🟢 Cancel async actions
-      if (timer) clearInterval(timer); // 🟢 Clear active timer
+      isMounted = false;
+      if (timer) clearInterval(timer);
     };
   }, []);
 
   function handleSubmit(formData: FormData) {
     verifyOTP(formData).then((res: IActionResponse<any>) => {
-      
-
       if (res.success) {
         setStatus("OTP verified successfully!");
       } else {
@@ -82,7 +79,11 @@ export default function SignUp() {
             name="otp"
             className="flex-1 "
           />
-          <button className="bg-primary h-8 w-24 rounded-md" ref={resendRef}>
+          <button
+            className="bg-primary h-8 w-24 rounded-md"
+            type="button"
+            ref={resendRef}
+          >
             Resend
           </button>
         </div>

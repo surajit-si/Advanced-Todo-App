@@ -5,10 +5,12 @@ import DatetimeInput from "./DatetimeInput";
 import { Info } from "lucide-react";
 import TodoSection from "./TagsSection";
 import { useState } from "react";
-import { createTodoLocal, getLocalUser } from "../../utils/localstorage";
+import { createTodoLocal, getLocalUser, IUser } from "../../utils/localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
 import { useUser } from "@/app/context/UserContext";
 import { useRouter } from "next/navigation";
+import { createPreferedTodo } from "@/app/_services/todo.services";
+import { getPreferedUser } from "@/app/_services/user.services";
 
 export default function TodoCreationTab({ className }: { className: string }) {
   const [todoTags, setTodoTags] = useState<string[]>([]);
@@ -16,21 +18,25 @@ export default function TodoCreationTab({ className }: { className: string }) {
   const { profile } = useProfile();
   const { user, setUser } = useUser();
 
-  const handleSubmit = (formData: FormData) => {
+  const handleSubmit = async (formData: FormData) => {
     const task = formData.get("todo_task") as string;
     const description = formData.get("description") as string;
     const dateTime = formData.get("dateTime");
     const deadline = new Date(dateTime as string);
 
-    createTodoLocal({
-      selectedProfile: profile,
-      task,
-      description,
-      deadline,
-      tags: todoTags,
-    });
+    createPreferedTodo(
+      {
+        task,
+        description,
+        deadline,
+        tags: todoTags,
+        selectedProfile: profile,
+      },
+      user?.isSignedIn as boolean,
+    );
+    //blank the tag state
     setTodoTags([]);
-    setUser(getLocalUser());
+    setUser(await getPreferedUser() as IUser);
   };
 
   //default dateTime

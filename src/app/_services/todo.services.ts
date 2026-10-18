@@ -1,3 +1,4 @@
+import { createTodo } from "../(Backend)/actions/todoActions";
 import {
   createTodoLocal,
   deleteTodoLocal,
@@ -21,7 +22,7 @@ export const createPreferedTodo = (
   isSignedIn: boolean,
 ) => {
   if (isSignedIn) {
-    //
+    createTodo({ task, description, deadline, tags });
   } else {
     createTodoLocal({ task, description, deadline, tags, selectedProfile });
   }

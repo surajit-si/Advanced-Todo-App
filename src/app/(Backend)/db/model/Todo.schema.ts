@@ -1,14 +1,14 @@
 import mongoose, { model, Schema } from "mongoose";
 
 export interface ITodo {
-  _id: string;
+  _id?: string;
   task: string;
-  deadline: Date;
+  deadline: Date | null;
   tags: string[];
   isCompleted: boolean;
   description: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
   completedAt: Date | null;
   reminder: Date | null;
   profile: mongoose.Types.ObjectId;
@@ -21,8 +21,6 @@ const TodoSchema: Schema<ITodo> = new Schema<ITodo>({
   tags: [{ type: String }],
   isCompleted: { type: Boolean, default: false },
   description: { type: String, required: false },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
   completedAt: { type: Date, required: false },
   reminder: { type: Date, required: false },
   profile: {

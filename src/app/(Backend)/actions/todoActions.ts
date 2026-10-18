@@ -1,2 +1,60 @@
 "use server";
 
+import mongoose from "mongoose";
+import { Profile } from "../db/model/Profile.schema";
+import { ITodo, Todo } from "../db/model/Todo.schema";
+import { IUser } from "../db/model/User.schema";
+import { verifyUser } from "./userActions";
+
+export async function createTodo({
+  task,
+  description,
+  deadline,
+  tags,
+}: {
+  task: string;
+  description?: string;
+  deadline: Date;
+  tags: string[];
+}) {
+  try {
+    const user = await verifyUser();
+    if (!user.success) {
+      return;
+    }
+
+    const userData = user.data as IUser;
+
+    //find the profile
+    const profile = await Profile.findOne({
+      name: userData.selectedProfile,
+      user: userData._id,
+    });
+
+    if (!profile) {
+      return;
+    }
+
+    const gap = deadline.getMilliseconds() - Date.now() <= 1000 * 60;
+
+    // const calcDeadline = deadline ? deadline : null;
+
+    const newTodo: ITodo = {
+      task: task.trim(),
+      description: description?.trim() || "",
+      isCompleted: false,
+      tags: tags,
+      reminder: null,
+      completedAt: null,
+      createdAt: new Date(),
+      deadline: gap ? null : deadline,
+      profile: new mongoose.Types.ObjectId(profile._id),
+      user: new mongoose.Types.ObjectId(userData._id),
+    };
+
+    const todo = await Todo.create(newTodo);
+  } catch (error) {
+    console.log("error.message");
+    console.log(error);
+  }
+}

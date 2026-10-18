@@ -253,14 +253,23 @@ export async function getUser(): Promise<
           from: "profiles",
           localField: "_id",
           foreignField: "user",
+          let: { profileId: "$_id" },
           as: "profiles",
+          pipeline: [
+            {
+              $lookup: {
+                from: "todos",
+                localField: "_id",
+                foreignField: "profile",
+                as: "todos",
+              },
+            },
+          ],
         },
       },
     ]);
 
     const AggregatedUser: IUser = result[0];
-
-    console.log(AggregatedUser);
 
     /* return ActionResponse({
       success: true,
@@ -293,6 +302,14 @@ export async function getUser(): Promise<
           ...profile,
           _id: profile._id.toString(),
           user: profile.user.toString(),
+          todos: profile.todos.map((todo) => {
+            return {
+              ...todo,
+              _id: todo._id.toString(),
+              user: todo.user.toString(),
+              profile: todo.profile.toString(),
+            };
+          }),
         })),
       },
     });

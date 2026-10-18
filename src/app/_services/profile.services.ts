@@ -1,5 +1,6 @@
 import {
   createServerProfile,
+  getSelectedProfileAction,
   updateUserSelectedProfileAction,
 } from "../(Backend)/actions/profileActions";
 import {
@@ -36,10 +37,14 @@ export const editPreferedProfile = (
   }
 };
 
-export const getPreferedProfile = (isSignedIn: boolean) => {
+export const getPreferedProfile = async (isSignedIn: boolean) => {
   if (isSignedIn) {
-    return "Guest";
+    console.log(isSignedIn);
+    
+    console.log(`using DB ${await getSelectedProfileAction()}`);
+    return await getSelectedProfileAction();
   } else {
+    console.log(`using LS ${getSelectedProfile()}`);
     return getSelectedProfile();
   }
 };

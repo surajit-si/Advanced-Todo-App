@@ -48,3 +48,12 @@ export async function updateUserSelectedProfileAction(profileName: string) {
     selectedProfile: profile.name,
   });
 }
+
+export async function getSelectedProfileAction() {
+  const user = await verifyUser();
+  if (!user.success) {
+    return;
+  }
+  const userData = user.data as IUser;
+  return userData.selectedProfile;
+}

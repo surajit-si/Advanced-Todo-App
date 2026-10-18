@@ -30,8 +30,15 @@ export default function Navbar() {
     createLocalStorageTemplate();
 
     //set user selected profile
-    setProfile(getPreferedProfile(user?.isSignedIn as boolean));
+    // setProfile(getPreferedProfile(user?.isSignedIn as boolean));
   }, []);
+
+  useEffect(() => {
+    if (user?.selectedProfile) {
+      setProfile(user.selectedProfile as string);
+      console.log(user.selectedProfile);
+    }
+  }, [user?.selectedProfile]);
 
   const handleProfileCreating = (formData: FormData) => {
     const profileName = formData.get("profileName") as string;

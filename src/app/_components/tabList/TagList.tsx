@@ -17,6 +17,7 @@ export default function TagList({ className }: { className?: string }) {
   const standardTags = ["All", "completed", "pending"];
   const profileTags =
     selectedProfile?.todos.flatMap((todo) => todo.tags ?? []) ?? [];
+    
   const list = [
     ...standardTags,
     ...new Set(profileTags.filter((tag) => !standardTags.includes(tag))),

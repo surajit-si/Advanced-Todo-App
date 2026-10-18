@@ -25,8 +25,6 @@ export default function Navbar() {
   const { user, setUser } = useUser();
   const localUser = user as IUser | null;
 
-  const router = useRouter();
-
   useEffect(() => {
     //if no account & no localstorage than create localstorage field
     createLocalStorageTemplate();
@@ -57,6 +55,11 @@ export default function Navbar() {
     setIsEditing(false);
   };
 
+  const handleProfileChanging = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setProfile(e.target.value);
+    updatePreferedProfile(e.target.value, user?.isSignedIn as boolean);
+  };
+
   //get the profiles
   useEffect(() => {
     //if not sign-in
@@ -73,13 +76,7 @@ export default function Navbar() {
               name="profile"
               id="profileSelection"
               className=" w-full "
-              onChange={(e) => {
-                setProfile(e.target.value);
-                updatePreferedProfile(
-                  e.target.value,
-                  user?.isSignedIn as boolean,
-                );
-              }}
+              onChange={handleProfileChanging}
             >
               {localUser?.profiles
                 .sort((a, b) => {

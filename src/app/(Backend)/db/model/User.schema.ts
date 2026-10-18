@@ -7,9 +7,8 @@ export interface IUser {
   password: string;
   createdAt: Date;
   updatedAt: Date;
-  todos: mongoose.Types.ObjectId[];
   profiles: mongoose.Types.ObjectId[];
-  selectedProfile: mongoose.Types.ObjectId;
+  selectedProfile: string;
   isVerified: boolean;
   isSignedIn: boolean;
 }
@@ -21,8 +20,7 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
     password: { type: String, required: true },
     profiles: [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }],
     selectedProfile: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Profile",
+      type: String,
     },
     isVerified: { type: Boolean, default: false },
     isSignedIn: { type: Boolean, default: true },

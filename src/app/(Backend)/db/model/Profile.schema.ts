@@ -16,6 +16,7 @@ const ProfileSchema: Schema<IProfile> = new Schema<IProfile>(
     user: {
       type: Schema.Types.ObjectId,
     },
+    todos: [{ type: Schema.Types.ObjectId, ref: "Todo" }],
   },
   {},
 );

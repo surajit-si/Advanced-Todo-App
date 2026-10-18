@@ -18,14 +18,14 @@ export interface IActionResponse<T> {
 export default function ActionResponse<T>({
   success,
   errorMsg,
-  data,
+  data: T,
   message,
   dev,
 }: IActionResponse<T>) {
   return {
     success,
     errorMsg,
-    data,
+    data: T,
     message,
     dev,
   };

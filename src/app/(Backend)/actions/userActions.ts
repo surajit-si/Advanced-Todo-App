@@ -13,6 +13,9 @@ import {
 import { Otp } from "../db/model/Otp.schema";
 import ActionResponse, { IActionResponse } from "../lib/ActionResponse";
 import { errors } from "jose";
+import { IProfile, Profile } from "../db/model/Profile.schema";
+import { profile } from "console";
+import { ObjectId } from "mongoose";
 
 async function refreshAccessToken(): Promise<boolean> {
   const cookieStore = await cookies();
@@ -80,7 +83,7 @@ export async function verifyUser() {
   if (!user)
     return ActionResponse({ success: false, errorMsg: "Invalid token!" });
 
-  return ActionResponse({ success: true, data: user });
+  return ActionResponse<IUser>({ success: true, data: user });
 }
 
 export async function registerUser(formData: FormData) {
@@ -122,10 +125,16 @@ export async function registerUser(formData: FormData) {
         errorMsg: "Email already in use!",
       });
 
+    //create user
     const user = await User.create({
       name: userName,
       email: email,
       password: password,
+    });
+    //create default profile
+    await Profile.create({
+      user: user._id,
+      name: user.name,
     });
 
     if (user) {
@@ -228,15 +237,32 @@ export async function getUser(): Promise<
 > {
   try {
     const response = await verifyUser();
-    if (!response) {
-      return ActionResponse({ success: false, errorMsg: "Unauthorized!" });
+    if (!response.success) {
+      return ActionResponse({
+        success: false,
+        errorMsg: response.errorMsg || "Unauthorized!",
+      });
     }
 
-    if (!response.success)
-      return ActionResponse({ success: false, errorMsg: response.errorMsg });
     const user = response.data as IUser;
 
-    return ActionResponse({
+    const result = await User.aggregate([
+      { $match: { _id: user._id } },
+      {
+        $lookup: {
+          from: "profiles",
+          localField: "_id",
+          foreignField: "user",
+          as: "profiles",
+        },
+      },
+    ]);
+
+    const AggregatedUser: IUser = result[0];
+
+    console.log(AggregatedUser);
+
+    /* return ActionResponse({
       success: true,
       data: {
         _id: user._id.toString(),
@@ -250,8 +276,29 @@ export async function getUser(): Promise<
         selectedProfile: user.selectedProfile,
         todos: user.todos,
       },
+    }); */
+
+    return ActionResponse({
+      success: true,
+      data: {
+        _id: AggregatedUser._id.toString(),
+        name: AggregatedUser.name,
+        email: AggregatedUser.email,
+        isSignedIn: AggregatedUser.isSignedIn,
+        isVerified: AggregatedUser.isVerified,
+        createdAt: AggregatedUser.createdAt,
+        updatedAt: AggregatedUser.updatedAt,
+        selectedProfile: AggregatedUser.selectedProfile,
+        profiles: AggregatedUser.profiles.map((profile) => ({
+          ...profile,
+          _id: profile._id.toString(),
+          user: profile.user.toString(),
+        })),
+      },
     });
   } catch (error) {
+    console.log(error);
+
     return ActionResponse({
       success: false,
       dev:

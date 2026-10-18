@@ -20,7 +20,15 @@ export default function SignUp() {
 
     setStatus("Creating account...");
     const res = await registerUser(formData);
-    console.log(res);
+    if (res?.success) {
+      setStatus("Account created successfully!");
+    } else {
+      setStatus(
+        res?.errorMsg
+          ? res.errorMsg
+          : "Failed to create account. Please try again.",
+      );
+    }
   }
 
   return (

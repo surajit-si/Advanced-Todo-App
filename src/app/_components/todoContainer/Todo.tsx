@@ -32,13 +32,13 @@ export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
 
   async function handleMarkCheck(e: MouseEvent<HTMLSpanElement>) {
     e.stopPropagation();
-    markPreferedTodoState(todo.id, "completed", user?.isSignedIn as boolean);
+    markPreferedTodoState(todo._id, "completed", user?.isSignedIn as boolean);
     setUser((await getPreferedUser()) as IUser);
   }
 
   async function handleMarkPending(e: MouseEvent<HTMLSpanElement>) {
     e.stopPropagation();
-    markPreferedTodoState(todo.id, "pending", user?.isSignedIn as boolean);
+    markPreferedTodoState(todo._id, "pending", user?.isSignedIn as boolean);
     setUser((await getPreferedUser()) as IUser);
   }
 
@@ -128,7 +128,7 @@ export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
           }}
           rightSideButtonCallback={async () => {
             if (user) {
-              deletePreferedTodo(todo.id, user.isSignedIn);
+              deletePreferedTodo(todo._id, user.isSignedIn);
             }
             setUser((await getPreferedUser()) as IUser);
             setIsDeleting(false);

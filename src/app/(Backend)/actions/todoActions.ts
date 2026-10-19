@@ -58,3 +58,15 @@ export async function createTodo({
     console.log(error);
   }
 }
+
+export async function deleteTodo(todoId: string) {
+  try {
+    const user = await verifyUser();
+    if (!user.success) {
+      return;
+    }
+    const userData = user.data as IUser;
+
+    const todo = await Todo.findByIdAndDelete(todoId);
+  } catch (error) {}
+}

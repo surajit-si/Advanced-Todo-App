@@ -16,7 +16,7 @@ export type IProfile = {
 };
 
 export type ITodo = {
-  id: string;
+  _id: string;
   task: string;
   deadline: Date | null;
   tags: string[];
@@ -154,7 +154,7 @@ export function createTodoLocal({
   // const calcDeadline = deadline ? deadline : null;
 
   const newTodo: ITodo = {
-    id: crypto.randomUUID(),
+    _id: crypto.randomUUID(),
     task: task.trim(),
     description: description?.trim(),
     isCompleted: false,
@@ -198,7 +198,7 @@ export function deleteTodoLocal(todoId: string) {
   }
 
   user.profiles[profileIdx].todos = user.profiles[profileIdx].todos.filter(
-    (todo) => todo.id !== todoId,
+    (todo) => todo._id !== todoId,
   );
 
   //update localStorage
@@ -221,7 +221,7 @@ export function markTodoLocalState(
 
   user.profiles[profileIdx].todos = user.profiles[profileIdx].todos.map(
     (todo) => {
-      if (todo.id === todoId) {
+      if (todo._id === todoId) {
         return {
           ...todo,
           isCompleted: state === "completed",

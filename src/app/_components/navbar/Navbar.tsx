@@ -3,27 +3,21 @@
 import { CirclePlus, SquarePen, X } from "lucide-react";
 import NavButton from "./NavButton";
 import { useEffect, useState } from "react";
-import {
-  createLocalStorageTemplate,
-  getLocalUser,
-  IUser,
-} from "../../utils/localstorage";
+import { createLocalStorageTemplate } from "../../utils/localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
 import {
   createPreferedProfile,
   editPreferedProfile,
-  getPreferedProfile,
   updatePreferedProfile,
 } from "@/app/_services/profile.services";
 import { useUser } from "@/app/context/UserContext";
-import { useRouter } from "next/navigation";
+import { getPreferedUser } from "@/app/_services/user.services";
 
 export default function Navbar() {
   const { profile, setProfile } = useProfile();
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const { user, setUser } = useUser();
-  const localUser = user as IUser | null;
 
   useEffect(() => {
     //if no account & no localstorage than create localstorage field
@@ -35,15 +29,17 @@ export default function Navbar() {
 
   useEffect(() => {
     if (user?.selectedProfile) {
-      setProfile(user.selectedProfile as string);
-      console.log(user.selectedProfile);
+      setProfile(user.selectedProfile);
     }
   }, [user?.selectedProfile]);
 
   const handleProfileCreating = (formData: FormData) => {
     const profileName = formData.get("profileName") as string;
     createPreferedProfile(profileName, user?.isSignedIn);
-    setUser(getLocalUser());
+
+    getPreferedUser().then((curr) => {
+      setUser(curr ?? null);
+    });
     setIsCreating(false);
   };
 
@@ -54,25 +50,42 @@ export default function Navbar() {
       profile as string,
       user?.isSignedIn as boolean,
       () => {
-        setProfile(profileName);
         updatePreferedProfile(profileName, user?.isSignedIn as boolean);
       },
     );
-    setUser(getLocalUser());
+    getPreferedUser().then((curr) => {
+      setUser(curr ?? null);
+    });
     setIsEditing(false);
   };
 
-  const handleProfileChanging = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setProfile(e.target.value);
-    updatePreferedProfile(e.target.value, user?.isSignedIn as boolean);
+  const handleProfileChanging = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const selectedProfile = e.target.value;
+    setProfile(selectedProfile);
+    await updatePreferedProfile(
+      selectedProfile,
+      user?.isSignedIn as boolean,
+    );
+    const curr = await getPreferedUser();
+    setUser(curr ?? null);
   };
 
+  const profiles = user?.profiles.filter(
+    (candidate): candidate is typeof candidate & { name: string } =>
+      typeof candidate === "object" &&
+      candidate !== null &&
+      "name" in candidate,
+  );
+  const selectedProfile = user?.selectedProfile;
+
   //get the profiles
-  useEffect(() => {
-    //if not sign-in
-    const todoProfiles = getLocalUser();
-    setUser(todoProfiles);
-  }, []);
+  /*   useEffect(() => {
+    getPreferedUser().then((curr) => {
+      setUser(curr ?? null);
+    });
+  }, []); */
 
   return (
     <div className="max-sm:h-12 w-full bg-primary flex justify-center items-center text-amber-50 ">
@@ -83,12 +96,13 @@ export default function Navbar() {
               name="profile"
               id="profileSelection"
               className=" w-full "
+              value={profile || user?.selectedProfile || ""}
               onChange={handleProfileChanging}
             >
-              {localUser?.profiles
-                .sort((a, b) => {
-                  if (a.name === localUser.selectedProfile) return -1;
-                  if (b.name === localUser.selectedProfile) return 1;
+              {profiles
+                ?.sort((a, b) => {
+                  if (a.name === selectedProfile) return -1;
+                  if (b.name === selectedProfile) return 1;
                   return 0;
                 })
                 .map((profile, idx) => {

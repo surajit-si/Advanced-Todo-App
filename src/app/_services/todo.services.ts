@@ -1,4 +1,4 @@
-import { createTodo } from "../(Backend)/actions/todoActions";
+import { createTodo, deleteTodo } from "../(Backend)/actions/todoActions";
 import {
   createTodoLocal,
   deleteTodoLocal,
@@ -29,8 +29,10 @@ export const createPreferedTodo = (
 };
 
 export const deletePreferedTodo = (todoId: string, isSignedIn: boolean) => {
+  console.log(todoId);
+
   if (isSignedIn) {
-    //
+    deleteTodo(todoId);
   } else {
     deleteTodoLocal(todoId);
   }

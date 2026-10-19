@@ -1,5 +1,6 @@
 import {
   createServerProfile,
+  editSelectedProfileAction,
   getSelectedProfileAction,
   updateUserSelectedProfileAction,
 } from "../(Backend)/actions/profileActions";
@@ -31,7 +32,7 @@ export const editPreferedProfile = (
   fn?: () => void,
 ) => {
   if (isSignedIn) {
-    //
+    editSelectedProfileAction(profileName, fn);
   } else {
     editSelectedProfile(profileName, selectedProfile, fn);
   }
@@ -40,7 +41,7 @@ export const editPreferedProfile = (
 export const getPreferedProfile = async (isSignedIn: boolean) => {
   if (isSignedIn) {
     console.log(isSignedIn);
-    
+
     console.log(`using DB ${await getSelectedProfileAction()}`);
     return await getSelectedProfileAction();
   } else {
@@ -49,12 +50,12 @@ export const getPreferedProfile = async (isSignedIn: boolean) => {
   }
 };
 
-export const updatePreferedProfile = (
+export const updatePreferedProfile = async (
   profileName: string,
   isSignedIn: boolean,
-) => {
+): Promise<void> => {
   if (isSignedIn) {
-    updateUserSelectedProfileAction(profileName);
+    await updateUserSelectedProfileAction(profileName);
   } else {
     updateSelectedProfile(profileName);
   }

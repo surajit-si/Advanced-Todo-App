@@ -19,11 +19,13 @@ export async function createServerProfile(name: string) {
       return;
     }
 
-    const profile = await Profile.create({
+    await Profile.create({
       name,
       todos: [],
       user: userId,
     });
+
+    await updateUserSelectedProfileAction(name);
   } catch (error) {}
 }
 
@@ -56,4 +58,21 @@ export async function getSelectedProfileAction() {
   }
   const userData = user.data as IUser;
   return userData.selectedProfile;
+}
+
+export async function editSelectedProfileAction(
+  profileName: string,
+  fn?: () => void,
+) {
+  const user = await verifyUser();
+  if (!user.success) {
+    return;
+  }
+  const userData = user.data as IUser;
+  //find selected profile and update
+  await Profile.findOneAndUpdate(
+    { name: userData.selectedProfile },
+    { name: profileName },
+  );
+  await updateUserSelectedProfileAction(profileName);
 }

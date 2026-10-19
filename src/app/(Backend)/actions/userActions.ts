@@ -13,9 +13,7 @@ import {
 import { Otp } from "../db/model/Otp.schema";
 import ActionResponse, { IActionResponse } from "../lib/ActionResponse";
 import { errors } from "jose";
-import { IProfile, Profile } from "../db/model/Profile.schema";
-import { profile } from "console";
-import { ObjectId } from "mongoose";
+import { Profile } from "../db/model/Profile.schema";
 
 async function refreshAccessToken(): Promise<boolean> {
   const cookieStore = await cookies();
@@ -150,6 +148,9 @@ export async function registerUser(formData: FormData) {
 
     isSuccess = true;
   } catch (error: unknown) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(error);
+    }
     return ActionResponse({
       success: false,
       errorMsg:
@@ -305,7 +306,7 @@ export async function getUser(): Promise<
           todos: profile.todos.map((todo) => {
             return {
               ...todo,
-              _id: todo._id.toString(),
+              _id: todo._id?.toString(),
               user: todo.user.toString(),
               profile: todo.profile.toString(),
             };

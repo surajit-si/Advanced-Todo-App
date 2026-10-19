@@ -1,7 +1,7 @@
 "use client";
 
 import { MouseEvent, useState } from "react";
-import { type Todo } from "./TodoContainer";
+import { type TodoType } from "./TodoContainer";
 import { CheckCheck, ChevronUp, Pencil, Trash, X } from "lucide-react";
 import {
   deletePreferedTodo,
@@ -12,7 +12,7 @@ import { getPreferedUser } from "@/app/_services/user.services";
 import { IUser } from "@/app/utils/localstorage";
 import DeletePopup from "../deleteButton/DeletePopup";
 
-export default function Todo({ todo, idx }: { todo: Todo; idx: number }) {
+export default function Todo({ todo, idx }: { todo: TodoType; idx: number }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isHovering, setIsHovering] = useState<boolean>(false);
 

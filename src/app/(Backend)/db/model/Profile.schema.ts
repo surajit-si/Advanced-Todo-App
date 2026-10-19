@@ -1,10 +1,11 @@
 import mongoose, { Schema } from "mongoose";
+import { ITodo } from "./Todo.schema";
 
 export interface IProfile {
   _id: string;
   name: string;
-  user: mongoose.Types.ObjectId;
-  todos: mongoose.Types.ObjectId[];
+  user: string | mongoose.Types.ObjectId;
+  todos: ITodo[];
 }
 
 const ProfileSchema: Schema<IProfile> = new Schema<IProfile>(

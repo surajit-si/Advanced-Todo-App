@@ -54,8 +54,9 @@ export async function createTodo({
 
     const todo = await Todo.create(newTodo);
   } catch (error) {
-    console.log("error.message");
-    console.log(error);
+    if (process.env.NODE_ENV === "development") {
+      console.error(error);
+    }
   }
 }
 
@@ -65,8 +66,32 @@ export async function deleteTodo(todoId: string) {
     if (!user.success) {
       return;
     }
-    const userData = user.data as IUser;
 
-    const todo = await Todo.findByIdAndDelete(todoId);
-  } catch (error) {}
+    await Todo.findByIdAndDelete(todoId);
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(error);
+    }
+  }
+}
+
+export async function markTodoState(
+  todoId: string,
+  currentState: "completed" | "pending",
+) {
+  try {
+    const user = await verifyUser();
+    if (!user.success) {
+      return;
+    }
+
+    const todo = await Todo.findByIdAndUpdate(todoId, {
+      isCompleted: currentState === "completed" ? true : false,
+      completedAt: currentState === "completed" ? new Date() : null,
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(error);
+    }
+  }
 }

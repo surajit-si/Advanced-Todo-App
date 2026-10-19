@@ -1,4 +1,8 @@
-import { createTodo, deleteTodo } from "../(Backend)/actions/todoActions";
+import {
+  createTodo,
+  deleteTodo,
+  markTodoState,
+} from "../(Backend)/actions/todoActions";
 import {
   createTodoLocal,
   deleteTodoLocal,
@@ -38,13 +42,13 @@ export const deletePreferedTodo = (todoId: string, isSignedIn: boolean) => {
   }
 };
 
-export const markPreferedTodoState = (
+export const markPreferedTodoState = async (
   todoId: string,
   currentState: "completed" | "pending",
   isSignedIn: boolean,
 ) => {
   if (isSignedIn) {
-    //
+    await markTodoState(todoId, currentState);
   } else {
     markTodoLocalState(todoId, currentState);
   }

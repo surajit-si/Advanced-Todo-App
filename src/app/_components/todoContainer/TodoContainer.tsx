@@ -7,7 +7,7 @@ import { filterByTag } from "@/app/utils/filter.utils";
 import { useSelectedTags } from "@/app/context/SelectedTagsContext";
 import { useProfile } from "@/app/context/ProfileContext";
 
-export type Todo = {
+export type TodoType = {
   _id: string;
   task: string;
   deadline: number;
@@ -27,7 +27,7 @@ export default function TodoContainer({ className }: { className?: string }) {
     return val.name === profile;
   });
 
-  const todoList: Todo[] =
+  const todoList: TodoType[] =
     localUser && selectedIdx !== undefined && selectedIdx >= 0
       ? localUser.profiles[selectedIdx].todos.map((todo: ITodo) => ({
           _id: todo._id,
@@ -49,7 +49,7 @@ export default function TodoContainer({ className }: { className?: string }) {
 
   const { selectedTags } = useSelectedTags();
 
-  const filteredTodoList: Todo[] = filterByTag({
+  const filteredTodoList: TodoType[] = filterByTag({
     rawTodo: todoList,
     tag: selectedTags,
   });

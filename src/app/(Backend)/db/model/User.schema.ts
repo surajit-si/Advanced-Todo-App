@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import { IProfile } from "./Profile.schema";
 
 export interface IUser {
   _id: string;
@@ -7,7 +8,7 @@ export interface IUser {
   password: string;
   createdAt: Date;
   updatedAt: Date;
-  profiles: mongoose.Types.ObjectId[];
+  profiles: IProfile[];
   selectedProfile: string;
   isVerified: boolean;
   isSignedIn: boolean;
@@ -26,6 +27,6 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
     isSignedIn: { type: Boolean, default: true },
   },
   { timestamps: true },
-);
+);;
 
 export const User = model("User", UserSchema);

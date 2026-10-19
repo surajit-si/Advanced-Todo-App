@@ -11,8 +11,8 @@ export interface ITodo {
   updatedAt?: Date;
   completedAt: Date | null;
   reminder: Date | null;
-  profile: mongoose.Types.ObjectId;
-  user: mongoose.Types.ObjectId;
+  profile: string | mongoose.Types.ObjectId;
+  user: string | mongoose.Types.ObjectId;
 }
 
 const TodoSchema: Schema<ITodo> = new Schema<ITodo>({

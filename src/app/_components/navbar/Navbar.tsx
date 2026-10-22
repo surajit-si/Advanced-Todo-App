@@ -1,17 +1,19 @@
 "use client";
 
-import { CirclePlus, SquarePen, X } from "lucide-react";
+import { CirclePlus, SquarePen, Trash, X } from "lucide-react";
 import NavButton from "./NavButton";
 import { useEffect, useState } from "react";
 import { createLocalStorageTemplate } from "../../utils/localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
 import {
   createPreferedProfile,
+  deletePreferedProfile,
   editPreferedProfile,
   updatePreferedProfile,
 } from "@/app/_services/profile.services";
 import { useUser } from "@/app/context/UserContext";
 import { getPreferedUser } from "@/app/_services/user.services";
+import DeletePopup from "../deleteButton/DeletePopup";
 
 export default function Navbar() {
   const { profile, setProfile } = useProfile();
@@ -64,12 +66,19 @@ export default function Navbar() {
   ) => {
     const selectedProfile = e.target.value;
     setProfile(selectedProfile);
-    await updatePreferedProfile(
-      selectedProfile,
-      user?.isSignedIn as boolean,
-    );
+    await updatePreferedProfile(selectedProfile, user?.isSignedIn as boolean);
     const curr = await getPreferedUser();
     setUser(curr ?? null);
+  };
+
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const handleProfileDelete = async () => {
+    await deletePreferedProfile(user?.isSignedIn as boolean);
+
+    getPreferedUser().then((curr) => {
+      setUser(curr ?? null);
+    });
+    setIsEditing(false);
   };
 
   const profiles = user?.profiles.filter(
@@ -89,6 +98,27 @@ export default function Navbar() {
 
   return (
     <div className="max-sm:h-12 w-full bg-primary flex justify-center items-center text-amber-50 ">
+      {isDeleting && (
+        <DeletePopup
+          contsiner={document.body}
+          leftSideButtonName="Cancel"
+          leftSideButtonClassName="text-primary"
+          rightSideButtonName="Delete"
+          rightSideButtonClassName="text-white bg-danger"
+          className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2"
+          leftSideButtonCallback={() => {
+            setIsDeleting(false);
+          }}
+          rightSideButtonCallback={async () => {
+            if (user) {
+              await handleProfileDelete();
+            }
+            setIsDeleting(false);
+          }}
+        >
+          <h2 className="text-xl">Do you want to delete?</h2>
+        </DeletePopup>
+      )}
       <div className="shrink-0 w-full flex p-2 gap-2">
         {!isCreating && !isEditing && (
           <form action="#" className="flex-1 shrink-0">
@@ -137,6 +167,18 @@ export default function Navbar() {
               placeholder="Enter new profile name:"
             />
           </form>
+        )}
+        {/* Profile Delete Button */}
+        {isEditing && (
+          <NavButton className="transition-opacity duration-300">
+            <Trash
+              strokeWidth={1.5}
+              color="#dc3545"
+              onClick={() => {
+                setIsDeleting(true);
+              }}
+            />
+          </NavButton>
         )}
 
         {/* Edit Button */}

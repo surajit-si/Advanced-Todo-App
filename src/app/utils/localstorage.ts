@@ -235,3 +235,20 @@ export function markTodoLocalState(
   //update localStorage
   localStorage.setItem("todoApp", JSON.stringify(user));
 }
+
+export const handleLocalProfileDelete = () => {
+  const user = getLocalUser();
+
+  const newUser: IUser = {
+    ...user,
+    profiles: user.profiles.filter((val) => val.name !== user.selectedProfile),
+  };
+
+  if (newUser.profiles.length === 0) {
+    //create a new profile
+    newUser.profiles = [{ id: crypto.randomUUID(), name: "Guest", todos: [] }];
+  }
+
+  newUser.selectedProfile = newUser.profiles[0].name;
+  localStorage.setItem("todoApp", JSON.stringify(newUser));
+};

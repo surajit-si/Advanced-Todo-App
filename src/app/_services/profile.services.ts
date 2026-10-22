@@ -1,5 +1,6 @@
 import {
   createServerProfile,
+  deleteProfileAction,
   editSelectedProfileAction,
   getSelectedProfileAction,
   updateUserSelectedProfileAction,
@@ -8,6 +9,7 @@ import {
   createProfile,
   editSelectedProfile,
   getSelectedProfile,
+  handleLocalProfileDelete,
   updateSelectedProfile,
 } from "../utils/localstorage";
 
@@ -58,5 +60,13 @@ export const updatePreferedProfile = async (
     await updateUserSelectedProfileAction(profileName);
   } else {
     updateSelectedProfile(profileName);
+  }
+};
+
+export const deletePreferedProfile = async (isSignedIn: boolean) => {
+  if (isSignedIn) {
+    await deleteProfileAction();
+  } else {
+    handleLocalProfileDelete();
   }
 };

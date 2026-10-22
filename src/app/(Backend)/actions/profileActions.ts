@@ -3,8 +3,9 @@
 import { ObjectId } from "mongoose";
 import { Profile } from "../db/model/Profile.schema";
 import connectDB from "../lib/connectDB";
-import { verifyUser } from "./userActions";
+import { getUser, verifyUser } from "./userActions";
 import { IUser, User } from "../db/model/User.schema";
+import { Todo } from "../db/model/Todo.schema";
 
 export async function createServerProfile(name: string) {
   try {
@@ -75,4 +76,45 @@ export async function editSelectedProfileAction(
     { name: profileName },
   );
   await updateUserSelectedProfileAction(profileName);
+}
+
+export async function deleteProfileAction() {
+  const userData = (await getUser()).data;
+  if (!userData) {
+    return;
+  }
+
+  const profile = await Profile.findOne({
+    name: userData.selectedProfile,
+    user: userData._id,
+  });
+
+  if (!profile) {
+    return;
+  }
+
+  await Profile.findByIdAndDelete(profile._id);
+
+  await Todo.deleteMany({ profile: profile._id });
+
+  /*  let editedUser: IUser | null = await User.findById(userData._id);
+
+  if (!editedUser) {
+    return;
+  } */
+
+  if (userData.profiles.length === 1) {
+    await createServerProfile(userData.name);
+    // await updateUserSelectedProfileAction(userData.name);
+  }
+
+  const editedUser = (await getUser()).data;
+  if (!editedUser) {
+    return;
+  }
+
+  //change selected profile
+  await User.findByIdAndUpdate(userData._id, {
+    selectedProfile: editedUser.profiles[0].name,
+  });
 }

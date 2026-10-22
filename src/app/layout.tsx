@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="openSansFont ">
-      <body className="min-h-dvh flex flex-col items-center ">
+      <body className="flex flex-col items-center">
         <SelectedTagsContextProvider>
           <ProfileProvider>
             <UserProvider>{children}</UserProvider>

@@ -26,3 +26,7 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+body {
+  height: 100dvh;
+}

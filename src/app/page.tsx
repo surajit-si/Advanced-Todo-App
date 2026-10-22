@@ -14,7 +14,7 @@ export default async function Home({
   // const showDeletingTab = isDeleting === "true";
 
   return (
-    <div className="w-full h-screen border relative">
+    <div className="w-full h-screen border relative bg-white">
       {/* Navbar */}
       <Navbar />
       {/* Tags List */}

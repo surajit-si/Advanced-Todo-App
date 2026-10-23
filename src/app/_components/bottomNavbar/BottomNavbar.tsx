@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import { useUser } from "../../context/UserContext";
 import {
   CirclePlus,
@@ -80,74 +81,82 @@ export default function BottomNavbar({ className }: { className?: string }) {
             }}
           />
 
-          {isProfileOpen && (
-            <div className="absolute py-4 px-2  top-0 -translate-y-full left-0 -translate-x-full w-60 rounded-2xl z-50 flex flex-col items-center bg-white shadow-[0_0_25px_rgba(0,0,0,0.5)]">
-              {/* Photo */}
-              <div className="aspect-square w-20 rounded-full overflow-hidden ">
-                {user?.isSignedIn ? (
-                  <img
-                    src={
-                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNaGxAjEhS_6L2RZ9oNBHFxgnv4qJmgp1DMOMDMpeM1w&s=10"
-                    }
-                    alt="Hello"
-                    className="bg-amber-200 h-full w-full rounded-full"
-                  />
-                ) : (
-                  <CircleUserRound
-                    className="h-full aspect-square text-gray-600 cursor-pointer "
-                    size={""}
-                    strokeWidth={1}
-                  />
-                )}
-              </div>
-              {/* Change avatar button */}
-              {user?.isSignedIn && (
-                <div
-                  className={`${!user && "hidden"} border flex rounded-2xl px-2 text-sm text-gray-600 cursor-pointer items-center gap-1 mt-1`}
-                >
-                  <UserPen className="text-gray-600 aspect-square w-4" />
-                  Change Avatar
+          <AnimatePresence>
+            {isProfileOpen && (
+              <motion.div
+                initial={{ x: 10, y: 10, opacity: 0 }}
+                animate={{ x: 0, y: 0, opacity: 1 }}
+                exit={{ x: 10, y: 10, opacity: 0 }}
+                transition={{ duration: 0.25, type: "spring" }}
+                className="absolute py-4 px-2  top-0 -translate-y-full left-0 -translate-x-full w-60 rounded-2xl z-50 flex flex-col items-center bg-white shadow-[0_0_25px_rgba(0,0,0,0.5)]"
+              >
+                {/* Photo */}
+                <div className="aspect-square w-20 rounded-full overflow-hidden ">
+                  {user?.isSignedIn ? (
+                    <img
+                      src={
+                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNaGxAjEhS_6L2RZ9oNBHFxgnv4qJmgp1DMOMDMpeM1w&s=10"
+                      }
+                      alt="Hello"
+                      className="bg-amber-200 h-full w-full rounded-full"
+                    />
+                  ) : (
+                    <CircleUserRound
+                      className="h-full aspect-square text-gray-600 cursor-pointer "
+                      size={""}
+                      strokeWidth={1}
+                    />
+                  )}
                 </div>
-              )}
-              {/* Buttons */}
-              <div className="mt-2 flex gap-2">
-                {/* Delete Button */}
-                {user?.isSignedIn ? (
-                  <button
-                    className={`Delete border border-danger px-4 py-1 rounded-4xl text-danger flex items-center gap-1 text-sm cursor-pointer transition-transform hover:scale-105 duration-200`}
+                {/* Change avatar button */}
+                {user?.isSignedIn && (
+                  <div
+                    className={`${!user && "hidden"} border flex rounded-2xl px-2 text-sm text-gray-600 cursor-pointer items-center gap-1 mt-1`}
                   >
-                    <Trash className="text-danger aspect-square w-4" />
-                    Delete
-                  </button>
-                ) : (
-                  <Link
-                    href={"/sign-up"}
-                    className={`Delete border border-primary px-4 py-1 rounded-4xl text-primary flex items-center gap-1 text-sm cursor-pointer transition-transform hover:scale-105 duration-200`}
-                  >
-                    <UserPlus className="text-primary aspect-square w-4" />
-                    Sign Up
-                  </Link>
+                    <UserPen className="text-gray-600 aspect-square w-4" />
+                    Change Avatar
+                  </div>
                 )}
-                {/* Logout Button */}
-                {user?.isSignedIn ? (
-                  <button
-                    className={`Delete border border-danger px-4 py-1 rounded-4xl text-white flex items-center gap-1 text-sm bg-danger cursor-pointer transition-transform hover:scale-105 duration-200`}
-                  >
-                    <LogOut className="text-white aspect-square w-4" />
-                    Logout
-                  </button>
-                ) : (
-                  <Link
-                    href={"/sign-in"}
-                    className={`Delete border border-primary px-4 py-1 rounded-4xl text-white flex items-center gap-1 text-sm bg-primary cursor-pointer transition-transform hover:scale-105 duration-200`}
-                  >
-                    <LogIn className="text-white aspect-square w-4" />
-                    Sign In
-                  </Link>
-                )}
-              </div>
-            </div>
-          )}
+                {/* Buttons */}
+                <div className="mt-2 flex gap-2">
+                  {/* Delete Button */}
+                  {user?.isSignedIn ? (
+                    <button
+                      className={`Delete border border-danger px-4 py-1 rounded-4xl text-danger flex items-center gap-1 text-sm cursor-pointer transition-transform hover:scale-105 duration-200`}
+                    >
+                      <Trash className="text-danger aspect-square w-4" />
+                      Delete
+                    </button>
+                  ) : (
+                    <Link
+                      href={"/sign-up"}
+                      className={`Delete border border-primary px-4 py-1 rounded-4xl text-primary flex items-center gap-1 text-sm cursor-pointer transition-transform hover:scale-105 duration-200`}
+                    >
+                      <UserPlus className="text-primary aspect-square w-4" />
+                      Sign Up
+                    </Link>
+                  )}
+                  {/* Logout Button */}
+                  {user?.isSignedIn ? (
+                    <button
+                      className={`Delete border border-danger px-4 py-1 rounded-4xl text-white flex items-center gap-1 text-sm bg-danger cursor-pointer transition-transform hover:scale-105 duration-200`}
+                    >
+                      <LogOut className="text-white aspect-square w-4" />
+                      Logout
+                    </button>
+                  ) : (
+                    <Link
+                      href={"/sign-in"}
+                      className={`Delete border border-primary px-4 py-1 rounded-4xl text-white flex items-center gap-1 text-sm bg-primary cursor-pointer transition-transform hover:scale-105 duration-200`}
+                    >
+                      <LogIn className="text-white aspect-square w-4" />
+                      Sign In
+                    </Link>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Todo Add Button */}

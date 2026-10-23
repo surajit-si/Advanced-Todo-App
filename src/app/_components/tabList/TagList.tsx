@@ -5,6 +5,7 @@ import { useSelectedTags } from "@/app/context/SelectedTagsContext";
 import { useUser } from "@/app/context/UserContext";
 import { useProfile } from "@/app/context/ProfileContext";
 import type { IUser } from "../../utils/localstorage";
+import { AnimatePresence, motion } from "motion/react";
 
 export default function TagList({ className }: { className?: string }) {
   const { selectedTags, setSelectedTags } = useSelectedTags();
@@ -17,7 +18,7 @@ export default function TagList({ className }: { className?: string }) {
   const standardTags = ["All", "completed", "pending"];
   const profileTags =
     selectedProfile?.todos.flatMap((todo) => todo.tags ?? []) ?? [];
-    
+
   const list = [
     ...standardTags,
     ...new Set(profileTags.filter((tag) => !standardTags.includes(tag))),
@@ -37,14 +38,16 @@ export default function TagList({ className }: { className?: string }) {
     >
       {list.map((tagName) => {
         return (
-          <Tab
-            title={tagName}
-            onClick={() => {
-              handleOnClick({ title: tagName });
-            }}
-            className={`${tagName === selectedTags ? "bg-primary/50!" : "bg-secondary!"}`}
-            key={tagName}
-          />
+          <motion.div key={tagName} whileTap={{ scale: 0.9 }}>
+            <Tab
+              title={tagName}
+              onClick={() => {
+                handleOnClick({ title: tagName });
+              }}
+              className={`${tagName === selectedTags ? "bg-primary/50!" : "bg-secondary!"}`}
+              key={tagName}
+            />
+          </motion.div>
         );
       })}
     </div>

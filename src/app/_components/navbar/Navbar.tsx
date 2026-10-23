@@ -14,6 +14,7 @@ import {
 import { useUser } from "@/app/context/UserContext";
 import { getPreferedUser } from "@/app/_services/user.services";
 import DeletePopup from "../deleteButton/DeletePopup";
+import { AnimatePresence, motion, scale } from "motion/react";
 
 export default function Navbar() {
   const { profile, setProfile } = useProfile();
@@ -120,100 +121,155 @@ export default function Navbar() {
         </DeletePopup>
       )}
       <div className="shrink-0 w-full flex p-2 gap-2">
-        {!isCreating && !isEditing && (
-          <form action="#" className="flex-1 shrink-0">
-            <select
-              name="profile"
-              id="profileSelection"
-              className=" w-full "
-              value={profile || user?.selectedProfile || ""}
-              onChange={handleProfileChanging}
+        <AnimatePresence mode="wait">
+          {!isCreating && !isEditing && (
+            <motion.div
+              key="select-box"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.25, type: "spring" }}
+              className="w-full"
             >
-              {profiles
-                ?.sort((a, b) => {
-                  if (a.name === selectedProfile) return -1;
-                  if (b.name === selectedProfile) return 1;
-                  return 0;
-                })
-                .map((profile, idx) => {
-                  return (
-                    <option value={profile.name} key={idx}>
-                      {profile.name}
-                    </option>
-                  );
-                })}
-            </select>
-          </form>
-        )}
+              <form action="#" className="flex-1 shrink-0">
+                <select
+                  name="profile"
+                  id="profileSelection"
+                  className=" w-full "
+                  value={profile || user?.selectedProfile || ""}
+                  onChange={handleProfileChanging}
+                >
+                  {profiles
+                    ?.sort((a, b) => {
+                      if (a.name === selectedProfile) return -1;
+                      if (b.name === selectedProfile) return 1;
+                      return 0;
+                    })
+                    .map((profile, idx) => {
+                      return (
+                        <option value={profile.name} key={idx}>
+                          {profile.name}
+                        </option>
+                      );
+                    })}
+                </select>
+              </form>
+            </motion.div>
+          )}
 
-        {isCreating && !isEditing && (
-          //creating
-          <form action={handleProfileCreating} className="flex-1 shrink-0">
-            <input
-              type="text"
-              name="profileName"
-              placeholder="Enter new profile name:"
-            />
-          </form>
-        )}
+          {isCreating && !isEditing && (
+            //creating
+            <motion.div
+              key="creating-box"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.25, type: "spring" }}
+              className="w-full"
+            >
+              <form action={handleProfileCreating} className="flex-1 shrink-0">
+                <input
+                  type="text"
+                  name="profileName"
+                  placeholder="Enter new profile name:"
+                />
+              </form>
+            </motion.div>
+          )}
 
-        {isEditing && !isCreating && (
-          //editing
-          <form action={handleProfileEditing} className="flex-1 shrink-0">
-            <input
-              type="text"
-              defaultValue={profile}
-              name="profileName"
-              placeholder="Enter new profile name:"
-            />
-          </form>
-        )}
+          {isEditing && !isCreating && (
+            //editing
+            <motion.div
+              key="editing-box"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.25, type: "spring" }}
+              className="w-full"
+            >
+              <form action={handleProfileEditing} className="flex-1 shrink-0">
+                <input
+                  type="text"
+                  defaultValue={profile}
+                  name="profileName"
+                  placeholder="Enter new profile name:"
+                />
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
         {/* Profile Delete Button */}
-        {isEditing && (
-          <NavButton className="transition-opacity duration-300">
-            <Trash
-              strokeWidth={1.5}
-              color="#dc3545"
+        <AnimatePresence>
+          {isEditing && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: -10 }}
+              transition={{ duration: 0.2, type: "spring" }}
+            >
+              <NavButton className="transition-opacity duration-300">
+                <Trash
+                  strokeWidth={1.5}
+                  color="#dc3545"
+                  onClick={() => {
+                    setIsDeleting(true);
+                  }}
+                />
+              </NavButton>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Edit Button */}
+        <NavButton>
+          <AnimatePresence mode="wait">
+            {!isEditing ? (
+              <motion.div
+                key="edit-icon"
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.85 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                  setIsCreating(false);
+                }}
+                className="cursor-pointer flex items-center justify-center"
+              >
+                <SquarePen color="#ffffff" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="close-icon"
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.85 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                  setIsCreating(false);
+                }}
+                className="cursor-pointer flex items-center justify-center"
+              >
+                <X color="#ffffff" strokeWidth={2} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </NavButton>
+
+        {/* Add Button */}
+        <motion.button whileTap={{ scale: 0.85 }}>
+          <NavButton>
+            <CirclePlus
+              className={`${isCreating && "rotate-45"} transition-transform duration-300`}
+              color="#ffffff"
               onClick={() => {
-                setIsDeleting(true);
+                setIsCreating(!isCreating);
+                setIsEditing(false);
               }}
             />
           </NavButton>
-        )}
-
-        {/* Edit Button */}
-        <NavButton className="">
-          {!isEditing ? (
-            <SquarePen
-              color="#ffffff"
-              onClick={() => {
-                setIsEditing(!isEditing);
-                setIsCreating(false);
-              }}
-            />
-          ) : (
-            <X
-              color="#ffffff"
-              strokeWidth={2}
-              className="transition-transform duration-300"
-              onClick={() => {
-                setIsEditing(!isEditing);
-                setIsCreating(false);
-              }}
-            />
-          )}
-        </NavButton>
-        {/* Add Button */}
-        <NavButton>
-          <CirclePlus
-            className={`${isCreating && "rotate-45"} transition-transform duration-300`}
-            color="#ffffff"
-            onClick={() => {
-              setIsCreating(!isCreating);
-              setIsEditing(false);
-            }}
-          />
-        </NavButton>
+        </motion.button>
       </div>
     </div>
   );

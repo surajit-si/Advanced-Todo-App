@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import ButtonForDeleteComp from "./Button";
 import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "motion/react";
 
 export default function DeletePopup({
   children,
@@ -24,7 +25,11 @@ export default function DeletePopup({
   contsiner: Element | DocumentFragment;
 }) {
   return createPortal(
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: -10, scale: 0.8 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 10, scale: 0.8 }}
+      transition={{ duration: 0.2 }}
       className={`${className} bg-amber-50 pt-8 pb-8 rounded-3xl w-8/10 min-w-60 max-w-80 shadow-[0_0_20px_rgba(0,0,0,0.5)]! flex flex-col justify-center items-center gap-4`}
       onClick={(e) => {
         e.stopPropagation();
@@ -46,7 +51,7 @@ export default function DeletePopup({
           className={rightSideButtonClassName}
         />
       </div>
-    </div>,
+    </motion.div>,
     contsiner,
   );
 }

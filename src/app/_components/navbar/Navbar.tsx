@@ -2,7 +2,7 @@
 
 import { CirclePlus, SquarePen, Trash, X } from "lucide-react";
 import NavButton from "./NavButton";
-import { useEffect, useRef, useState } from "react";
+import { Ref, useEffect, useRef, useState } from "react";
 import { createLocalStorageTemplate } from "../../utils/localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
 import {
@@ -213,7 +213,7 @@ export default function Navbar() {
             >
               <NavButton className="transition-opacity duration-300">
                 <Trash
-                  ref={deleteProfileButton}
+                  ref={deleteProfileButton as Ref<SVGSVGElement>}
                   strokeWidth={1.5}
                   color="#dc3545"
                   onClick={() => {

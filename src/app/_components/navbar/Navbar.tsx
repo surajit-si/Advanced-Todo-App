@@ -2,7 +2,7 @@
 
 import { CirclePlus, SquarePen, Trash, X } from "lucide-react";
 import NavButton from "./NavButton";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createLocalStorageTemplate } from "../../utils/localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
 import {
@@ -15,6 +15,7 @@ import { useUser } from "@/app/context/UserContext";
 import { getPreferedUser } from "@/app/_services/user.services";
 import DeletePopup from "../deleteButton/DeletePopup";
 import { AnimatePresence, motion, scale } from "motion/react";
+import { useOutsideClick } from "@/app/utils/useOutsideClick";
 
 export default function Navbar() {
   const { profile, setProfile } = useProfile();
@@ -90,12 +91,15 @@ export default function Navbar() {
   );
   const selectedProfile = user?.selectedProfile;
 
-  //get the profiles
-  /*   useEffect(() => {
-    getPreferedUser().then((curr) => {
-      setUser(curr ?? null);
-    });
-  }, []); */
+  const deleteProfileButton = useRef<HTMLButtonElement>(null);
+  useOutsideClick(
+    deleteProfileButton,
+    () => {
+      setIsDeleting(false);
+    },
+    [],
+    isDeleting,
+  );
 
   return (
     <div className="max-sm:h-12 w-full bg-primary flex justify-center items-center text-amber-50 ">
@@ -209,6 +213,7 @@ export default function Navbar() {
             >
               <NavButton className="transition-opacity duration-300">
                 <Trash
+                  ref={deleteProfileButton}
                   strokeWidth={1.5}
                   color="#dc3545"
                   onClick={() => {

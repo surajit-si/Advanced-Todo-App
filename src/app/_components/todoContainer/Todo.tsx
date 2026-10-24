@@ -1,6 +1,6 @@
 "use client";
 
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useRef, useState } from "react";
 import { type TodoType } from "./TodoContainer";
 import { CheckCheck, ChevronUp, Pencil, Trash, X } from "lucide-react";
 import {
@@ -12,6 +12,7 @@ import { getPreferedUser } from "@/app/_services/user.services";
 import { IUser } from "@/app/utils/localstorage";
 import DeletePopup from "../deleteButton/DeletePopup";
 import { AnimatePresence, motion } from "motion/react";
+import { useOutsideClick } from "@/app/utils/useOutsideClick";
 
 export default function Todo({ todo, idx }: { todo: TodoType; idx: number }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -55,6 +56,16 @@ export default function Todo({ todo, idx }: { todo: TodoType; idx: number }) {
     e.stopPropagation();
     alert("Editing is not implemented yet.");
   }
+
+  const todoDeleteButton = useRef<HTMLButtonElement>(null);
+  useOutsideClick(
+    todoDeleteButton,
+    () => {
+      setIsDeleting(false);
+    },
+    [],
+    isDeleting,
+  );
 
   return (
     <div
@@ -136,6 +147,7 @@ export default function Todo({ todo, idx }: { todo: TodoType; idx: number }) {
           {/* Delete */}
           <motion.span
             key={"delete"}
+            ref={todoDeleteButton}
             whileTap={{ scale: 0.85 }}
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.1 }}

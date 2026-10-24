@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { createPreferedTodo } from "@/app/_services/todo.services";
 import { getPreferedUser } from "@/app/_services/user.services";
 import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "motion/react";
 
 export default function TodoCreationTab({
   className,
@@ -56,7 +57,11 @@ export default function TodoCreationTab({
   const router = useRouter();
 
   return createPortal(
-    <form
+    <motion.form
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 10 }}
+      transition={{ duration: 0.25, type: "spring" }}
       action={handleSubmit}
       onSubmit={() => {
         router.push("?isCreating=false");
@@ -137,7 +142,7 @@ export default function TodoCreationTab({
       >
         Create
       </button>
-    </form>,
+    </motion.form>,
     container,
   );
 }

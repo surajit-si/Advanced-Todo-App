@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { redirect, useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
 import { getPreferedUser } from "@/app/_services/user.services";
 import { useOutsideClick } from "@/app/utils/useOutsideClick";
 import Link from "next/link";
@@ -29,7 +28,6 @@ export default function BottomNavbar({ className }: { className?: string }) {
   }, []);
 
   const searchParams = useSearchParams();
-  const isCreating = searchParams.get("isCreating");
 
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const profileContainerRef = useRef<HTMLDivElement>(null);
@@ -40,8 +38,6 @@ export default function BottomNavbar({ className }: { className?: string }) {
     [],
     isProfileOpen,
   );
-
-  const router = useRouter();
 
   //User
   const { user, setUser } = useUser();
@@ -178,14 +174,16 @@ export default function BottomNavbar({ className }: { className?: string }) {
         </div>
 
         {/* Todo Add Button */}
-        <div
+        <motion.div
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.05 }}
           className="todoAddButton aspect-square w-14 bg-primary absolute left-1/2 rounded-full -translate-x-1/2 -top-1/2 flex justify-center items-center text-white text-2xl cursor-pointer"
           onClick={() => {
             setIsCreationMenuOpen(!isCreationMenuOpen);
           }}
         >
           <CirclePlus />
-        </div>
+        </motion.div>
       </div>
     </div>
   );

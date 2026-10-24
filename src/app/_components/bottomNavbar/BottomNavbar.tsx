@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { getPreferedUser } from "@/app/_services/user.services";
 import { useOutsideClick } from "@/app/utils/useOutsideClick";
 import Link from "next/link";
+import TodoCreationTab from "../TodoCreationTab/TodoCreationTab";
 
 export default function BottomNavbar({ className }: { className?: string }) {
   // alert
@@ -64,8 +65,25 @@ export default function BottomNavbar({ className }: { className?: string }) {
     });
   }, []);
 
+  //todo creation menu
+  const [isCreationMenuOpen, setIsCreationMenuOpen] = useState<boolean>(false);
+  const creationMenuContainerRef = useRef<HTMLDivElement>(null);
+
+  useOutsideClick(
+    creationMenuContainerRef,
+    () => setIsCreationMenuOpen(false),
+    [],
+    isCreationMenuOpen,
+  );
+
   return (
     <div className={`${className} absolute bottom-0 w-full`}>
+      {isCreationMenuOpen && (
+        <TodoCreationTab
+          container={window.document.body}
+          className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2"
+        />
+      )}
       <div
         className={` w-full h-10 flex flex-row justify-between px-16 border-t border-[black]/40 items-center relative`}
       >
@@ -163,11 +181,7 @@ export default function BottomNavbar({ className }: { className?: string }) {
         <div
           className="todoAddButton aspect-square w-14 bg-primary absolute left-1/2 rounded-full -translate-x-1/2 -top-1/2 flex justify-center items-center text-white text-2xl cursor-pointer"
           onClick={() => {
-            if (isCreating == "true") {
-              router.push("?isCreating=false");
-            } else {
-              router.push("?isCreating=true");
-            }
+            setIsCreationMenuOpen(!isCreationMenuOpen);
           }}
         >
           <CirclePlus />

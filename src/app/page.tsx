@@ -2,7 +2,7 @@ import BottomNavbar from "./_components/bottomNavbar/BottomNavbar";
 import Navbar from "./_components/navbar/Navbar";
 import TagList from "./_components/tabList/TagList";
 import TodoContainer from "./_components/todoContainer/TodoContainer";
-import TodoCreationTab from "./_components/TodoCreationTab/TodoCreationTab";
+
 
 export default async function Home({
   searchParams,
@@ -10,7 +10,6 @@ export default async function Home({
   searchParams: Promise<{ isCreating: string; isDeleting: string }>;
 }) {
   const { isCreating, isDeleting } = await searchParams;
-  const showCreationTab = isCreating === "true";
   // const showDeletingTab = isDeleting === "true";
 
   return (
@@ -38,9 +37,7 @@ export default async function Home({
         </DeletePopup>
       )} */}
 
-      {showCreationTab && (
-        <TodoCreationTab className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />
-      )}
+      
     </div>
   );
 }

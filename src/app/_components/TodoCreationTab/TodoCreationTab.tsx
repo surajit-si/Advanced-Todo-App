@@ -11,8 +11,15 @@ import { useUser } from "@/app/context/UserContext";
 import { useRouter } from "next/navigation";
 import { createPreferedTodo } from "@/app/_services/todo.services";
 import { getPreferedUser } from "@/app/_services/user.services";
+import { createPortal } from "react-dom";
 
-export default function TodoCreationTab({ className }: { className: string }) {
+export default function TodoCreationTab({
+  className,
+  container,
+}: {
+  className?: string;
+  container: Element | DocumentFragment;
+}) {
   const [todoTags, setTodoTags] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { profile } = useProfile();
@@ -36,7 +43,7 @@ export default function TodoCreationTab({ className }: { className: string }) {
     );
     //blank the tag state
     setTodoTags([]);
-    setUser(await getPreferedUser() as IUser);
+    setUser((await getPreferedUser()) as IUser);
   };
 
   //default dateTime
@@ -48,7 +55,7 @@ export default function TodoCreationTab({ className }: { className: string }) {
 
   const router = useRouter();
 
-  return (
+  return createPortal(
     <form
       action={handleSubmit}
       onSubmit={() => {
@@ -130,6 +137,7 @@ export default function TodoCreationTab({ className }: { className: string }) {
       >
         Create
       </button>
-    </form>
+    </form>,
+    container,
   );
 }

@@ -10,12 +10,15 @@ An enterprise-grade, full-stack **Task Management & Advanced Todo Application** 
 - **🔐 User Authentication:** Secure signup, login, and session management (OAuth & Email/Password).
 - **📋 Task Management:**
   - Create, edit and delete tasks.
-  - Priority levels (Low, Medium, High, Urgent).
+  - Create, edit Profiles.
+  - Local Storage for offline access.
+  - Sign-in for cloud save.
+  <!--   - Priority levels (Low, Medium, High, Urgent). -->
   - Task categories, tags, and custom labels.
-  - Due dates with visual indicator alerts.
-- **🔍 Advanced Filtering & Search:** Real-time search, sorting, and status-based filtering (Pending, In Progress, Completed).
-<!-- - **📊 Analytics & Insights:** Visual task progress metrics and productivity tracking. -->
-<!-- - **🌗 Dark / Light Mode:** Dynamic theme switching with system preference detection. -->
+      <!--  - Due dates with visual indicator alerts. -->
+    <!-- - **🔍 Advanced Filtering & Search:** Real-time search, sorting, and status-based filtering (Pending, In Progress, Completed). -->
+      <!-- - **📊 Analytics & Insights:** Visual task progress metrics and productivity tracking. -->
+      <!-- - **🌗 Dark / Light Mode:** Dynamic theme switching with system preference detection. -->
 - **📱 Responsive & Accessible:** Fully mobile-optimized UI following WCAG accessibility guidelines.
 
 ---
@@ -27,12 +30,12 @@ An enterprise-grade, full-stack **Task Management & Advanced Todo Application** 
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **State Management:** React Context API
 - **Icons:** [Lucide React](https://lucide.dev/)
-- **Database & ORM:** Prisma / Drizzle / MongoDB / PostgreSQL _(Customize as needed)_
+- **Database & ORM:** MongoDB
 - **Authentication:** NextAuth.js (Auth.js) / Clerk
 
 ---
 
-## 📁 Project Structure
+<!-- ## 📁 Project Structure
 
 ```text
 .
@@ -59,3 +62,4 @@ An enterprise-grade, full-stack **Task Management & Advanced Todo Application** 
 ├── package.json                # Dependencies and scripts
 └── tsconfig.json               # TypeScript configuration
 ```
+ -->

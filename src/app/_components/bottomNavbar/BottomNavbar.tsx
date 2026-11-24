@@ -63,7 +63,7 @@ export default function BottomNavbar({ className }: { className?: string }) {
 
   //todo creation menu
   const [isCreationMenuOpen, setIsCreationMenuOpen] = useState<boolean>(false);
-  const creationMenuContainerRef = useRef<HTMLDivElement>(null);
+  const creationMenuContainerRef = useRef<HTMLFormElement>(null);
 
   useOutsideClick(
     creationMenuContainerRef,
@@ -76,6 +76,10 @@ export default function BottomNavbar({ className }: { className?: string }) {
     <div className={`${className} absolute bottom-0 w-full`}>
       {isCreationMenuOpen && (
         <TodoCreationTab
+          onCreation={() => {
+            setIsCreationMenuOpen((state) => !state);
+          }}
+          containerRef={creationMenuContainerRef}
           container={window.document.body}
           className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2"
         />

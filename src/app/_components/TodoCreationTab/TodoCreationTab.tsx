@@ -4,7 +4,7 @@ import BetterInput from "@/app/(auth)/sign-up/BetterInput";
 import DatetimeInput from "./DatetimeInput";
 import { Info } from "lucide-react";
 import TodoSection from "./TagsSection";
-import { useState } from "react";
+import { Ref, RefObject, useState } from "react";
 import { createTodoLocal, getLocalUser, IUser } from "../../utils/localstorage";
 import { useProfile } from "@/app/context/ProfileContext";
 import { useUser } from "@/app/context/UserContext";
@@ -17,9 +17,13 @@ import { AnimatePresence, motion } from "motion/react";
 export default function TodoCreationTab({
   className,
   container,
+  containerRef,
+  onCreation
 }: {
   className?: string;
   container: Element | DocumentFragment;
+  containerRef: RefObject<HTMLFormElement | null>;
+  onCreation: Function;
 }) {
   const [todoTags, setTodoTags] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -63,8 +67,10 @@ export default function TodoCreationTab({
       exit={{ opacity: 0, y: 10 }}
       transition={{ duration: 0.25, type: "spring" }}
       action={handleSubmit}
+      ref={containerRef}
       onSubmit={() => {
-        router.push("?isCreating=false");
+        // router.push("?isCreating=false");
+        onCreation()
       }}
       className={`${className} w-[calc(100%-1rem)] max-w-108 p-4 rounded-lg bg-white flex flex-col gap-2 shadow-[0_0_20px_rgba(0,0,0,0.6)]`}
     >
